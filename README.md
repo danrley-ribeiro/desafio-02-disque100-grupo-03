@@ -27,11 +27,10 @@ streamlit run streamlit_app/app.py
 > Ou pelo atalho legado: `streamlit run dashboards/app_sc_disque100_streamlit.py`
 > Acesse no navegador: `http://localhost:8501`
 
-### 3. Visualizar Relatórios e Mapas HTML
-Os arquivos da pasta `dashboards/` são autocontidos e abrem diretamente no navegador:
-- **`apresentacao_executiva_indicios_penais_sc.html`**: Apresentação executiva e pitch técnico.
-- **`dashboard_sc_disque100_folium.html`**: Mapa interativo com focos penais e unidades PCI-SC.
-- **`dashboard_executivo_grupos_sc.html`**: Painel comparativo por grupo vulnerável.
+### 3. Visualizar Pitch Executivo e Mapas HTML
+- **`pitch.html`** (na raiz): Apresentação executiva e pitch técnico em slides interativos (basta abrir no navegador com dois cliques).
+- **`dashboards/dashboard_sc_disque100_folium.html`**: Mapa interativo com focos penais e unidades PCI-SC.
+- **`dashboards/dashboard_executivo_grupos_sc.html`**: Painel comparativo por grupo vulnerável.
 
 ---
 
@@ -39,6 +38,7 @@ Os arquivos da pasta `dashboards/` são autocontidos e abrem diretamente no nave
 
 ```text
 desafio-02-disque100-grupo-03/
+├── pitch.html       # Apresentação executiva / pitch em slides interativos (HTML autocontido)
 ├── dashboards/      # Mapas e relatórios interativos em HTML (com proxy legado do Streamlit)
 ├── data/            # Data Lakehouse (Bronze: dados brutos, Prata: tratados, Ouro: DuckDB/SQLite)
 ├── notebooks/       # Jupyter Notebook com análise exploratória completa
