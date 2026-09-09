@@ -7,8 +7,12 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="sc_distribuicao_penal_dados.js"></script>
+  <script src="../data/processed/sc_distribuicao_penal_dados.js"></script>
+  <script>
+    if (!window.SC_PENAL_METRICAS) {
+      document.write('<script src="sc_distribuicao_penal_dados.js"><\/script>');
+    }
+  </script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -263,9 +267,9 @@
               <td class="py-3 px-4 text-slate-400">Sistema Nacional de Informações de Segurança Pública (SENASP) e protocolos de investigação.</td>
             </tr>
             <tr class="hover:bg-slate-800/30 transition-colors">
-              <td class="py-3 px-4 font-bold text-white">Ministério do Desenvolvimento Social (MDS)</td>
-              <td class="py-3 px-4"><a href="https://www.gov.br/mds/pt-br/acoes-e-programas/assistencia-social/unidades-de-atendimento/cras-e-creas" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.gov.br/mds/pt-br/acoes-e-programas/assistencia-social/unidades-de-atendimento/cras-e-creas</a></td>
-              <td class="py-3 px-4 text-slate-400">Tipificação Nacional de Serviços Socioassistenciais e parâmetros de atendimento do CRAS/CREAS.</td>
+              <td class="py-3 px-4 font-bold text-white">Ministério do Desenvolvimento e Assistência Social, Família e Combate à Fome (MDS)</td>
+              <td class="py-3 px-4"><a href="https://www.gov.br/mds/pt-br/acoes-e-programas/SUAS" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.gov.br/mds/pt-br/acoes-e-programas/SUAS</a></td>
+              <td class="py-3 px-4 text-slate-400">Tipificação Nacional de Serviços Socioassistenciais (Resolução CNAS nº 109/2009) e parâmetros da rede SUAS (CRAS/CREAS).</td>
             </tr>
             <tr class="hover:bg-slate-800/30 transition-colors">
               <td class="py-3 px-4 font-bold text-white">Instituto Brasileiro de Geografia e Estatística (IBGE)</td>
@@ -274,12 +278,12 @@
             </tr>
             <tr class="hover:bg-slate-800/30 transition-colors">
               <td class="py-3 px-4 font-bold text-white">Polícia Científica de Santa Catarina (PCI-SC)</td>
-              <td class="py-3 px-4"><a href="https://www.policiacientifica.sc.gov.br/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.policiacientifica.sc.gov.br</a></td>
+              <td class="py-3 px-4"><a href="https://www.policiacientifica.sc.gov.br/unidades/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.policiacientifica.sc.gov.br/unidades/</a></td>
               <td class="py-3 px-4 text-slate-400">Estrutura organizacional das 7 superintendências regionais e 23 núcleos periciais.</td>
             </tr>
             <tr class="hover:bg-slate-800/30 transition-colors">
               <td class="py-3 px-4 font-bold text-white">Polícia Civil de Santa Catarina (PCSC)</td>
-              <td class="py-3 px-4"><a href="https://www.pc.sc.gov.br/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.pc.sc.gov.br</a></td>
+              <td class="py-3 px-4"><a href="https://pcporelas.pc.sc.gov.br/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://pcporelas.pc.sc.gov.br/</a></td>
               <td class="py-3 px-4 text-slate-400">Mapeamento das Delegacias de Proteção à Criança, Adolescente, Mulher e Idoso (DPCAMI).</td>
             </tr>
           </tbody>
@@ -299,7 +303,10 @@
     // Carrega dados agregados
     async function initDashboard() {
       try {
-        const resp = await fetch('sc_kpis_grupos_municipios.csv');
+        let resp = await fetch('../data/processed/sc_kpis_grupos_municipios.csv');
+        if (!resp.ok) {
+          resp = await fetch('sc_kpis_grupos_municipios.csv');
+        }
         const text = await resp.text();
         kpiData = parseCSV(text);
         renderizarPainel();
@@ -431,7 +438,7 @@
     }
 
     function baixarCSV() {
-      window.open('sc_kpis_grupos_municipios.csv', '_blank');
+      window.open('../data/processed/sc_kpis_grupos_municipios.csv', '_blank');
     }
 
     window.addEventListener('DOMContentLoaded', () => {

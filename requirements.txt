@@ -12,3 +12,9 @@ rich>=13.0.0
 # Visualização de Dados e Mapas Geoespaciais
 plotly>=5.18.0
 folium>=0.15.0
+matplotlib>=3.11.1
+
+# Aplicação Web e Banco de Dados Analítico
+streamlit>=1.30.0
+duckdb>=1.0.0
+

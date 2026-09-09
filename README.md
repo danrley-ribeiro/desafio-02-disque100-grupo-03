@@ -1,23 +1,30 @@
 # 🛡️ Sistema de Inteligência Territorial do Disque 100 (SC)
-
-Plataforma analítica e geoespacial para monitoramento de denúncias do **Disque 100 / Ouvidoria Nacional de Direitos Humanos** nos **295 municípios de Santa Catarina** (2011 a 2026).
-
 O sistema realiza **triagem automática** entre ilícitos penais e demandas socioassistenciais, cruzando dados históricos com a demografia do **Censo IBGE 2022** e com as 30 unidades da **Polícia Científica de SC (PCI-SC)**.
 
 ---
 
 ## ⚡ Início Rápido
 
-### 1. Ativar o Ambiente
+### 1. Criar e Ativar o Ambiente Virtual
 ```bash
+# Criar o ambiente virtual (.venv)
+python3 -m venv .venv
+
+# Ativar o ambiente
+# No Linux/macOS:
 source .venv/bin/activate
+# No Windows:
+# .venv\Scripts\activate
+
+# Instalar as dependências
 pip install -r requirements.txt
 ```
 
 ### 2. Executar o Painel Streamlit
 ```bash
-streamlit run dashboards/app_sc_disque100_streamlit.py
+streamlit run streamlit_app/app.py
 ```
+> Ou pelo atalho legado: `streamlit run dashboards/app_sc_disque100_streamlit.py`
 > Acesse no navegador: `http://localhost:8501`
 
 ### 3. Visualizar Relatórios e Mapas HTML
@@ -32,11 +39,13 @@ Os arquivos da pasta `dashboards/` são autocontidos e abrem diretamente no nave
 
 ```text
 desafio-02-disque100-grupo-03/
-├── dashboards/      # Painel Streamlit e mapas/relatórios interativos em HTML
+├── dashboards/      # Mapas e relatórios interativos em HTML (com proxy legado do Streamlit)
 ├── data/            # Data Lakehouse (Bronze: dados brutos, Prata: tratados, Ouro: DuckDB/SQLite)
 ├── notebooks/       # Jupyter Notebook com análise exploratória completa
-└── scripts/         # Pipelines ETL de ingestão, triagem penal e agregação
+├── scripts/         # Pipelines ETL de ingestão, triagem penal e agregação
+└── streamlit_app/   # Aplicação Streamlit modular e otimizada (components, views, utils)
 ```
+
 
 ---
 
