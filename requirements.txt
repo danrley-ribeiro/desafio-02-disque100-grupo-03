@@ -1,0 +1,14 @@
+# Processamento e Análise de Dados de Alta Performance
+polars>=1.0.0
+pyarrow>=15.0.0
+pandas>=2.0.0
+
+# Requisições HTTP e Download Paralelo
+requests>=2.31.0
+
+# Interface de Terminal e Barras de Progresso
+rich>=13.0.0
+
+# Visualização de Dados e Mapas Geoespaciais
+plotly>=5.18.0
+folium>=0.15.0

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Governo de Santa Catarina | Painel de Inteligência do Disque 100 por Grupos Vulneráveis</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="sc_distribuicao_penal_dados.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #090d16;
+      color: #f8fafc;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .active-tab {
+      background: #4f46e5 !important;
+      color: #ffffff !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 4px 14px -2px rgba(99, 102, 241, 0.5);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- HEADER GOVERNAMENTAL -->
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-800 px-6 py-3.5 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-rose-500 flex items-center justify-center shadow-lg shadow-indigo-600/30">
+        <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">Governo do Estado de Santa Catarina</span>
+          <span class="text-xs text-slate-500">•</span>
+          <span class="text-xs text-emerald-400 font-semibold">Base Auditada (Censo 2022)</span>
+        </div>
+        <h1 class="text-base font-bold text-white">Inteligência Territorial do Disque 100: Grupos Vulneráveis & Indícios Penais</h1>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <a href="dashboard_sc_disque100_folium.html" target="_blank" class="flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-md shadow-indigo-900/40 transition-all">
+        <i data-lucide="map" class="w-3.5 h-3.5"></i>
+        <span>Abrir Mapa Folium (Picos & PCI)</span>
+      </a>
+      <a href="PROPOSTA_TECNICA_GOVSC_PIPELINE_DADOS_DISQUE100.md" target="_blank" class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all">
+        <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Dossiê Técnico Nuvem</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- SELETOR DE GRUPOS VULNERÁVEIS (PILLS MODERNAS) -->
+    <div class="glass-card p-4 rounded-2xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Selecione o Grupo Vulnerável para Análise:</span>
+        </div>
+        <!-- Toggle Penal vs Geral -->
+        <div class="flex items-center space-x-2 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
+          <button id="btnFiltroTodos" onclick="setFiltroPenal(false)" class="px-3 py-1 rounded-lg font-semibold transition-all bg-indigo-600 text-white">
+            Todos os Casos
+          </button>
+          <button id="btnFiltroPenal" onclick="setFiltroPenal(true)" class="px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">
+            ⚖️ Apenas Indícios Penais
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2" id="grupoPillsContainer">
+        <button onclick="selecionarGrupo('geral')" id="pill-geral" class="grupo-pill active-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>🛡️ Visão Geral</span>
+        </button>
+        <button onclick="selecionarGrupo('criancas')" id="pill-criancas" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>👶 Crianças & Adolescentes</span>
+        </button>
+        <button onclick="selecionarGrupo('mulheres')" id="pill-mulheres" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>👩 Mulheres (Gênero/Doméstica)</span>
+        </button>
+        <button onclick="selecionarGrupo('idosos')" id="pill-idosos" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>👴 Pessoas Idosas</span>
+        </button>
+        <button onclick="selecionarGrupo('pcd')" id="pill-pcd" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>♿ Pessoas com Deficiência</span>
+        </button>
+        <button onclick="selecionarGrupo('lgbt')" id="pill-lgbt" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>🏳️‍🌈 População LGBTQIA+</span>
+        </button>
+        <button onclick="selecionarGrupo('prisional')" id="pill-prisional" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
+          <span>⛓️ Sistema Prisional & Rua</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 4 BIG KPIS DA SELEÇÃO ATIVA -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="glass-card p-5 rounded-xl border-l-4 border-l-indigo-500">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Volume de Denúncias</span>
+        <div id="kpiVolume" class="text-3xl font-extrabold text-white">--</div>
+        <div id="kpiVolumeSub" class="text-xs text-indigo-400 mt-1">Ocorrências auditadas em SC</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-xl border-l-4 border-l-rose-500">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Indício Penal (Polícia/IML)</span>
+        <div id="kpiPenal" class="text-3xl font-extrabold text-rose-400">--</div>
+        <div id="kpiPenalPct" class="text-xs text-rose-300 mt-1">--% do volume do grupo</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-xl border-l-4 border-l-amber-500">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Taxa Média Estadual</span>
+        <div id="kpiTaxa" class="text-3xl font-extrabold text-amber-400">--</div>
+        <div class="text-xs text-slate-400 mt-1">Por 10.000 habitantes (Censo 2022)</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-xl border-l-4 border-l-emerald-500">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Líder Territorial de Pico</span>
+        <div id="kpiLiderMun" class="text-xl font-bold text-white truncate">--</div>
+        <div id="kpiLiderTaxa" class="text-xs text-emerald-400 mt-1">--</div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO PRINCIPAL: GRÁFICO DOS 10 PICOS & TABELA RANKING -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Gráfico Top 10 Picos -->
+      <div class="lg:col-span-6 glass-card p-6 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Inteligência Espacial</span>
+            <h3 class="text-lg font-bold text-white" id="tituloGraficoTop10">Top 10 Municípios em Pico (Taxa / 10k Hab)</h3>
+          </div>
+          <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">Por 10k Hab</span>
+        </div>
+        <div class="h-80 w-full">
+          <canvas id="chartTop10"></canvas>
+        </div>
+        <div class="mt-4 p-3 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-300 flex items-center justify-between">
+          <span>⚠️ Focos no interior possuem taxas até 4,7x maiores que as capitais.</span>
+          <a href="dashboard_sc_disque100_folium.html" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-semibold ml-2">Ver Radar no Mapa &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Tabela dos Top 10 Focos com Distância PCI -->
+      <div class="lg:col-span-6 glass-card p-6 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-400">Gargalo Pericial & Forense</span>
+            <h3 class="text-lg font-bold text-white">Detalhamento dos Focos Críticos</h3>
+          </div>
+          <span class="text-xs text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">PCI-SC Ativa</span>
+        </div>
+        
+        <div class="overflow-x-auto max-h-80">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-900/90 text-slate-400 uppercase tracking-wider sticky top-0 border-b border-slate-800">
+              <tr>
+                <th class="p-2.5">Rank</th>
+                <th class="p-2.5">Município</th>
+                <th class="p-2.5 text-right">População</th>
+                <th class="p-2.5 text-right">Casos</th>
+                <th class="p-2.5 text-right font-bold text-rose-400">Taxa / 10k</th>
+                <th class="p-2.5">Região</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaTop10Body" class="divide-y divide-slate-800/60 font-mono">
+              <!-- Preenchido via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 p-3 bg-indigo-950/20 border border-indigo-800/30 rounded-xl text-xs text-indigo-300">
+          <strong>Integração com Polícia Científica:</strong> As denúncias de lesão física e crimes sexuais exigem perícia médica e preservação do kit de DNA em até 72 horas.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SEÇÃO DE AUDITORIA & METADADOS DUCKDB / STREAMLIT -->
+    <div class="glass-card p-6 rounded-2xl">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Camada de Engenharia de Dados & Nuvem</span>
+          <h3 class="text-lg font-bold text-white">Arquitetura de Dados Auditável (DuckDB & Parquet)</h3>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="baixarCSV()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center space-x-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Exportar CSV Completo</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-300">
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <div class="font-bold text-white mb-1 flex items-center space-x-1.5">
+            <i data-lucide="database" class="w-4 h-4 text-indigo-400"></i>
+            <span>Modelagem Dimensional DuckDB/SQL</span>
+          </div>
+          <p class="text-slate-400 text-[11px] leading-relaxed">
+            Estrutura <em>Star Schema</em> com tabelas <code>fato_denuncias_sc</code> (699k linhas), <code>dim_municipios</code> (295 municípios com Censo 2022) e <code>dim_unidades_pci</code> (30 unidades forenses).
+          </p>
+        </div>
+
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <div class="font-bold text-white mb-1 flex items-center space-x-1.5">
+            <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+            <span>Painel Streamlit Interativo</span>
+          </div>
+          <p class="text-slate-400 text-[11px] leading-relaxed">
+            Execute localmente para visão interativa com filtros dinâmicos:<br>
+            <code class="bg-slate-950 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-[10px]">streamlit run app_sc_disque100_streamlit.py</code>
+          </p>
+        </div>
+
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <div class="font-bold text-white mb-1 flex items-center space-x-1.5">
+            <i data-lucide="lock" class="w-4 h-4 text-cyan-400"></i>
+            <span>Conformidade com a LGPD</span>
+          </div>
+          <p class="text-slate-400 text-[11px] leading-relaxed">
+            Total anonimização de PII de crianças e vítimas sensíveis na camada analítica. Hashes criptográficos SHA-256 para auditoria pericial.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FONTES OFICIAIS DA INTERNET GOVERNAMENTAL (GOV.BR) -->
+    <div class="glass-card p-6 rounded-2xl">
+      <div class="flex items-center space-x-2 mb-4">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Fontes Oficiais da Internet Governamental (Gov.br)</h3>
+      </div>
+      <div class="overflow-x-auto border border-slate-800 rounded-xl">
+        <table class="w-full text-xs text-left text-slate-300">
+          <thead class="text-[11px] uppercase bg-slate-900/90 text-slate-400 border-b border-slate-800">
+            <tr>
+              <th class="py-3 px-4 font-bold">Órgão / Portal</th>
+              <th class="py-3 px-4 font-bold">Link Oficial</th>
+              <th class="py-3 px-4 font-bold">Descrição</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">Ministério dos Direitos Humanos e da Cidadania (MDHC)</td>
+              <td class="py-3 px-4"><a href="https://www.gov.br/mdh/pt-br/ondh" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.gov.br/mdh/pt-br/ondh</a></td>
+              <td class="py-3 px-4 text-slate-400">Painel de Dados da Ouvidoria Nacional de Direitos Humanos e microdados abertos do Disque 100.</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">Ministério da Justiça e Segurança Pública (MJSP)</td>
+              <td class="py-3 px-4"><a href="https://www.gov.br/mj/pt-br/assuntos/sua-seguranca/seguranca-publica/senasp" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.gov.br/mj/pt-br/assuntos/sua-seguranca/seguranca-publica/senasp</a></td>
+              <td class="py-3 px-4 text-slate-400">Sistema Nacional de Informações de Segurança Pública (SENASP) e protocolos de investigação.</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">Ministério do Desenvolvimento Social (MDS)</td>
+              <td class="py-3 px-4"><a href="https://www.gov.br/mds/pt-br/acoes-e-programas/assistencia-social/unidades-de-atendimento/cras-e-creas" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.gov.br/mds/pt-br/acoes-e-programas/assistencia-social/unidades-de-atendimento/cras-e-creas</a></td>
+              <td class="py-3 px-4 text-slate-400">Tipificação Nacional de Serviços Socioassistenciais e parâmetros de atendimento do CRAS/CREAS.</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">Instituto Brasileiro de Geografia e Estatística (IBGE)</td>
+              <td class="py-3 px-4"><a href="https://sidra.ibge.gov.br/tabela/4714" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://sidra.ibge.gov.br/tabela/4714</a></td>
+              <td class="py-3 px-4 text-slate-400">Censo Demográfico 2022: População residente oficial dos 295 municípios catarinenses.</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">Polícia Científica de Santa Catarina (PCI-SC)</td>
+              <td class="py-3 px-4"><a href="https://www.policiacientifica.sc.gov.br/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.policiacientifica.sc.gov.br</a></td>
+              <td class="py-3 px-4 text-slate-400">Estrutura organizacional das 7 superintendências regionais e 23 núcleos periciais.</td>
+            </tr>
+            <tr class="hover:bg-slate-800/30 transition-colors">
+              <td class="py-3 px-4 font-bold text-white">Polícia Civil de Santa Catarina (PCSC)</td>
+              <td class="py-3 px-4"><a href="https://www.pc.sc.gov.br/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.pc.sc.gov.br</a></td>
+              <td class="py-3 px-4 text-slate-400">Mapeamento das Delegacias de Proteção à Criança, Adolescente, Mulher e Idoso (DPCAMI).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SCRIPTS E CONTROLADORES REATIVOS -->
+  <script>
+    let kpiData = [];
+    let grupoAtivo = 'geral';
+    let apenasPenal = false;
+    let chartInstance = null;
+
+    // Carrega dados agregados
+    async function initDashboard() {
+      try {
+        const resp = await fetch('sc_kpis_grupos_municipios.csv');
+        const text = await resp.text();
+        kpiData = parseCSV(text);
+        renderizarPainel();
+      } catch (e) {
+        console.warn("Erro ao carregar CSV, usando fallback:", e);
+      }
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      return lines.slice(1).map(line => {
+        const vals = line.split(',');
+        const obj = {};
+        headers.forEach((h, i) => {
+          const v = vals[i] ? vals[i].trim() : '';
+          obj[h] = isNaN(v) ? v : Number(v);
+        });
+        return obj;
+      });
+    }
+
+    function selecionarGrupo(grp) {
+      grupoAtivo = grp;
+      document.querySelectorAll('.grupo-pill').forEach(p => p.classList.remove('active-tab'));
+      const activePill = document.getElementById(`pill-${grp}`);
+      if (activePill) activePill.classList.add('active-tab');
+      renderizarPainel();
+    }
+
+    function setFiltroPenal(ePenal) {
+      apenasPenal = ePenal;
+      const btnTodos = document.getElementById('btnFiltroTodos');
+      const btnPenal = document.getElementById('btnFiltroPenal');
+      if (apenasPenal) {
+        btnPenal.className = "px-3 py-1 rounded-lg font-semibold transition-all bg-rose-600 text-white";
+        btnTodos.className = "px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white transition-all";
+      } else {
+        btnTodos.className = "px-3 py-1 rounded-lg font-semibold transition-all bg-indigo-600 text-white";
+        btnPenal.className = "px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white transition-all";
+      }
+      renderizarPainel();
+    }
+
+    function renderizarPainel() {
+      if (!kpiData || kpiData.length === 0) return;
+
+      let colTotal = (grupoAtivo === 'geral') ? 'total_denuncias' : `${grupoAtivo}_total`;
+      let colPenal = (grupoAtivo === 'geral') ? 'total_penal' : `${grupoAtivo}_penal`;
+      let colTaxa = apenasPenal ? 
+        ((grupoAtivo === 'geral') ? 'taxa_penal_10k' : `taxa_${grupoAtivo}_penal_10k`) :
+        ((grupoAtivo === 'geral') ? 'taxa_total_10k' : `taxa_${grupoAtivo}_10k`);
+
+      // Calcula totais estaduais
+      let volTotal = kpiData.reduce((acc, r) => acc + (r[colTotal] || 0), 0);
+      let volPenal = kpiData.reduce((acc, r) => acc + (r[colPenal] || 0), 0);
+      let popTotal = kpiData.reduce((acc, r) => acc + (r['populacao_censo_2022'] || 0), 0);
+      let taxaMedia = apenasPenal ? (volPenal / popTotal * 10000) : (volTotal / popTotal * 10000);
+      let pctPenal = (volPenal / Math.max(volTotal, 1)) * 100;
+
+      // Atualiza KPIs
+      document.getElementById('kpiVolume').innerText = volTotal.toLocaleString('pt-BR');
+      document.getElementById('kpiPenal').innerText = volPenal.toLocaleString('pt-BR');
+      document.getElementById('kpiPenalPct').innerText = `${pctPenal.toFixed(1)}% do volume total`;
+      document.getElementById('kpiTaxa').innerText = taxaMedia.toFixed(2);
+
+      // Top 10 ordenados pela taxa / 10k
+      const top10 = [...kpiData].sort((a, b) => (b[colTaxa] || 0) - (a[colTaxa] || 0)).slice(0, 10);
+      if (top10.length > 0) {
+        document.getElementById('kpiLiderMun').innerText = top10[0].municipio;
+        document.getElementById('kpiLiderTaxa').innerText = `Taxa: ${top10[0][colTaxa].toFixed(2)}/10k (${top10[0].regiao_intermediaria})`;
+      }
+
+      // Renderiza Tabela Top 10
+      const tbody = document.getElementById('tabelaTop10Body');
+      tbody.innerHTML = top10.map((r, i) => `
+        <tr class="hover:bg-slate-800/40 transition-colors">
+          <td class="p-2.5 text-slate-400">#${i + 1}</td>
+          <td class="p-2.5 font-bold text-white">${r.municipio}</td>
+          <td class="p-2.5 text-right text-slate-400">${(r.populacao_censo_2022 || 0).toLocaleString('pt-BR')}</td>
+          <td class="p-2.5 text-right font-semibold text-indigo-300">${(r[colTotal] || 0).toLocaleString('pt-BR')}</td>
+          <td class="p-2.5 text-right font-extrabold text-amber-400">${(r[colTaxa] || 0).toFixed(2)}</td>
+          <td class="p-2.5 text-slate-400 text-[11px]">${r.regiao_intermediaria}</td>
+        </tr>
+      `).join('');
+
+      // Renderiza Gráfico Top 10
+      renderizarGraficoTop10(top10, colTaxa);
+    }
+
+    function renderizarGraficoTop10(top10, colTaxa) {
+      const ctx = document.getElementById('chartTop10');
+      if (!ctx) return;
+
+      if (chartInstance) chartInstance.destroy();
+
+      const labels = top10.map(r => r.municipio);
+      const dataVals = top10.map(r => r[colTaxa]);
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Taxa / 10k Hab',
+            data: dataVals,
+            backgroundColor: apenasPenal ? 'rgba(244, 63, 94, 0.85)' : 'rgba(99, 102, 241, 0.85)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { display: false }, ticks: { color: '#f8fafc', font: { size: 10, weight: 'bold' } } }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (c) => ` Taxa: ${c.raw.toFixed(2)} por 10 mil hab`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function baixarCSV() {
+      window.open('sc_kpis_grupos_municipios.csv', '_blank');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initDashboard();
+    });
+  </script>
+</body>
+</html>
+

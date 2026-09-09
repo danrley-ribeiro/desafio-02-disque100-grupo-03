@@ -1,0 +1,7 @@
+{
+  "name": "desafio-02-disque100-grupo-03",
+  "private": true,
+  "dependencies": {
+    "puppeteer": "^25.9.0"
+  }
+}

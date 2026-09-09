@@ -1,0 +1,1082 @@
+[
+  {
+    "slug": "ararangua",
+    "municipio": "Araranguá",
+    "ibge_code": "4201406",
+    "latitude": -28.9355,
+    "longitude": -49.4925,
+    "rodovia_principal": "BR-101 (km 412)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/ararangua/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Araranguá – PCI/SCRI/NRARA",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Criciúma Perito Regional Rafael Olivo da Luz nrara",
+    "responsavel": "Perito Regional Rafael Olivo da Luz",
+    "email": "nrara@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida Sete de Setembro, nº 2909, Bairro Vila São José",
+        "telefone": "(48) 3529-0111",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Avenida Sete de Setembro, nº 2909, Bairro Vila São José",
+        "telefone": "(48) 3529-0111",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida Sete de Setembro, nº 2909, Bairro Vila São José",
+        "telefone": "(48) 3529-0111",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "balneario-camboriu",
+    "municipio": "Balneário Camboriú",
+    "ibge_code": "4202008",
+    "latitude": -26.9926,
+    "longitude": -48.6346,
+    "rodovia_principal": "BR-101 (km 135)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/balneario-camboriu/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Balneário Camboriú – PCI/SRBCA",
+    "vinculacao": "Sede Regional (Balneário Camboriú)",
+    "responsavel": "Superintendente Regional Rudy Cezar Bedin Oliveira",
+    "email": "srbca@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Av. Brasil, 1271 – Sala LE29",
+        "telefone": "(47) 3398-6369",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Av. Brasil, 1271 – Sala LE29",
+        "telefone": "(47) 3398-6369",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Av. Brasil, 1271 – Sala LE29",
+        "telefone": "(47) 3398-6369",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "blumenau",
+    "municipio": "Blumenau",
+    "ibge_code": "4202404",
+    "latitude": -26.9194,
+    "longitude": -49.0661,
+    "rodovia_principal": "BR-470 / SC-108 (Vale do Itajaí)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/blumenau/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Blumenau – PCI/SRBLU",
+    "vinculacao": "Sede Regional (Blumenau)",
+    "responsavel": "Superintendente Regional Iury Alves e Silva",
+    "email": "srblu@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rodovia Paul Fritz Kuehnrich, 1600",
+        "telefone": "(47) 3378-8250",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rodovia Paul Fritz Kuehnrich, 1600",
+        "telefone": "(47) 3378-8250",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rodovia Paul Fritz Kuehnrich, 1600",
+        "telefone": "(47) 3378-8250",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "brusque",
+    "municipio": "Brusque",
+    "ibge_code": "4202909",
+    "latitude": -27.0984,
+    "longitude": -48.9113,
+    "rodovia_principal": "SC-486 (Acesso à BR-101 / Itajaí)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/brusque/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Brusque – PCI/SRBCA/NRBRQ",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Balneário Camboriú Perita Regional Rossana Aparecia Liberato Lessa nrbrq",
+    "responsavel": "Perita Regional Rossana Aparecia Liberato Lessa",
+    "email": "nrbrq@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Av. Arno Carlos Gracher, 412 – Centro",
+        "telefone": "(47) 3251-8253",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Av. Arno Carlos Gracher, 412 – Centro",
+        "telefone": "(47) 3251-8253",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Av. Arno Carlos Gracher, 412 – Centro",
+        "telefone": "(47) 3251-8253",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "campos-novos",
+    "municipio": "Campos Novos",
+    "ibge_code": "4203600",
+    "latitude": -27.4019,
+    "longitude": -51.2253,
+    "rodovia_principal": "BR-282 / BR-470 (Trevo Central)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/campos-novos/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Campos Novos – PCI/SRCDR/NRCNV",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Caçador Perito Regional Artur Franceschini Richter nrcnv",
+    "responsavel": "Perito Regional Artur Franceschini Richter",
+    "email": "nrcnv@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Coronel Pedro Carlos, 1001 – Centro",
+        "telefone": "(49) 3541-3533",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Coronel Pedro Carlos, 1001 – Centro",
+        "telefone": "(49) 3541-3533",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Coronel Pedro Carlos, 1001 – Centro",
+        "telefone": "(49) 3541-3533",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "canoinhas",
+    "municipio": "Canoinhas",
+    "ibge_code": "4203808",
+    "latitude": -26.1772,
+    "longitude": -50.3956,
+    "rodovia_principal": "BR-280 / SC-477 (Planalto Norte)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/canoinhas/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Canoinhas – PCI/SRJOI/NRCAN",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Joinville Perito Regional Marcelo Sanseverino Mello nrcan",
+    "responsavel": "Perito Regional Marcelo Sanseverino Mello",
+    "email": "nrcan@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua João Allage, 197 – Centro",
+        "telefone": "(47) 3627-4063",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua João Allage, 197 – Centro",
+        "telefone": "(47) 3627-4063",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua João Allage, 197 – Centro",
+        "telefone": "(47) 3627-4063",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "cacador",
+    "municipio": "Caçador",
+    "ibge_code": "4203006",
+    "latitude": -26.7753,
+    "longitude": -51.0125,
+    "rodovia_principal": "SC-350 / SC-135 (Meio-Oeste)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/cacador/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Caçador – PCI/SRCDR",
+    "vinculacao": "Sede Regional (Caçador)",
+    "responsavel": "Superintendente Regional Gustavo Silva Leite",
+    "email": "srcdr@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Carlos Coelho de Souza, 120 – DER",
+        "telefone": "(49) 3561-6850",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Carlos Coelho de Souza, 120 – DER",
+        "telefone": "(49) 3561-6850",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Carlos Coelho de Souza, 120 – DER",
+        "telefone": "(49) 3561-6850",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "chapeco",
+    "municipio": "Chapecó",
+    "ibge_code": "4204202",
+    "latitude": -27.1004,
+    "longitude": -52.6152,
+    "rodovia_principal": "BR-282 / BR-480 / SC-480 (Oeste)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/chapeco/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Chapecó – PCI/SRCCO",
+    "vinculacao": "Sede Regional (Chapecó)",
+    "responsavel": "Superintendente Regional Felipe Salata Braga",
+    "email": "srcco@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Centro, Chapecó - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Centro, Chapecó - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Centro, Chapecó - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "concordia",
+    "municipio": "Concórdia",
+    "ibge_code": "4204301",
+    "latitude": -27.2336,
+    "longitude": -52.0261,
+    "rodovia_principal": "BR-153 (Transbrasiliana) / SC-283",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/concordia/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Concórdia – PCI/SRCCO/NRCDA",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Chapecó Perito Regional Alex Sandro Vergana Borges nrcda",
+    "responsavel": "Perito Regional Alex Sandro Vergana Borges",
+    "email": "nrcda@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua João Suzin Marini, 155 – Salete",
+        "telefone": "(49) 3482-6196",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua João Suzin Marini, 155 – Salete",
+        "telefone": "(49) 3482-6196",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua João Suzin Marini, 155 – Salete",
+        "telefone": "(49) 3482-6196",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "criciuma",
+    "municipio": "Criciúma",
+    "ibge_code": "4204608",
+    "latitude": -28.6775,
+    "longitude": -49.3708,
+    "rodovia_principal": "SC-445 / Via Rápida (Acesso BR-101)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/criciuma/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Criciúma – PCI/SRCRI",
+    "vinculacao": "Sede Regional (Criciúma)",
+    "responsavel": "Superintendente Regional Jones Cambruzzi Pereira",
+    "email": "srcri@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Mal. Floriano Peixoto, 220 – 1º andar",
+        "telefone": "(48) 98858-4342",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Mal. Floriano Peixoto, 220 – 1º andar",
+        "telefone": "(48) 98858-4342",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Mal. Floriano Peixoto, 220 – 1º andar",
+        "telefone": "(48) 98858-4342",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "curitibanos",
+    "municipio": "Curitibanos",
+    "ibge_code": "4204806",
+    "latitude": -27.2828,
+    "longitude": -50.5844,
+    "rodovia_principal": "BR-470 / SC-120 (Região Central)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/curitibanos/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Curitibanos – PCI/SRLGS/NRCTB",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Lages Perito Regional Anderson Stevens nrctb",
+    "responsavel": "Perito Regional Anderson Stevens",
+    "email": "nrctb@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida Coronel Vidal Ramos, 1026 – Sala 01",
+        "telefone": "(49) 3412-3134",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Avenida Coronel Vidal Ramos, 1026 – Sala 01",
+        "telefone": "(49) 3412-3134",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida Coronel Vidal Ramos, 1026 – Sala 01",
+        "telefone": "(49) 3412-3134",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "florianopolis",
+    "municipio": "Florianópolis",
+    "ibge_code": "4205407",
+    "latitude": -27.5954,
+    "longitude": -48.548,
+    "rodovia_principal": "BR-282 (Via Expressa) / SC-401 / SC-405",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/florianopolis/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Florianópolis – PCI/SRFLN",
+    "vinculacao": "Sede Regional (Florianópolis)",
+    "responsavel": "Superintendente Regional Cassiano Mozar Fachinello Bremm",
+    "email": "srfln@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Esteves Júnior, 50 – Edifício Top Tower",
+        "telefone": "(48) 3665-9335",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Esteves Júnior, 50 – Edifício Top Tower",
+        "telefone": "(48) 3665-9335",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Esteves Júnior, 50 – Edifício Top Tower",
+        "telefone": "(48) 3665-9335",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "itajai",
+    "municipio": "Itajaí",
+    "ibge_code": "4208203",
+    "latitude": -26.9078,
+    "longitude": -48.6619,
+    "rodovia_principal": "BR-101 (km 118) / BR-470 (Acesso Porto)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/itajai/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Itajaí – PCI/SRBCA/NRITJ",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Balneário Camboriú Perito",
+    "responsavel": "Superintendente Regional Rudy Cezar Bedin Oliveira",
+    "email": "nritj@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Samuel Heusi, 234 – Loja SS 02",
+        "telefone": "(47) 98861-1054",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Samuel Heusi, 234 – Loja SS 02",
+        "telefone": "(47) 98861-1054",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Samuel Heusi, 234 – Loja SS 02",
+        "telefone": "(47) 98861-1054",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "jaragua-do-sul",
+    "municipio": "Jaraguá do Sul",
+    "ibge_code": "4208906",
+    "latitude": -26.4851,
+    "longitude": -49.0722,
+    "rodovia_principal": "BR-280 / SC-110 (Norte)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/jaragua-do-sul/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Jaraguá do Sul – PCI/SRJOI/NRJDS",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Joinville Perita Regional Marina Brunheri Paim nrjds",
+    "responsavel": "Perita Regional Marina Brunheri Paim",
+    "email": "nrjds@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida Getúlio Vargas, 268 – Centro",
+        "telefone": "(47) 3276-9388",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Centro, Jaraguá do Sul - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida Getúlio Vargas, 268 – Centro",
+        "telefone": "(47) 3276-9388",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "joacaba",
+    "municipio": "Joaçaba",
+    "ibge_code": "4209003",
+    "latitude": -27.1756,
+    "longitude": -51.5036,
+    "rodovia_principal": "BR-282 / SC-150 (Vale do Rio do Peixe)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/joacaba/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Joaçaba – PCI/SRCDR/NRJBA",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Caçador Perito Regional Geraldo Camara Mariz nrjba",
+    "responsavel": "Perito Regional Geraldo Camara Mariz",
+    "email": "nrjba@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida Santa Terezinha, nº 2659, Menino Deus",
+        "telefone": "(49) 3527-9694",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Centro, Joaçaba - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida Santa Terezinha, nº 2659, Menino Deus",
+        "telefone": "(49) 3527-9694",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "joinville",
+    "municipio": "Joinville",
+    "ibge_code": "4209102",
+    "latitude": -26.3044,
+    "longitude": -48.8487,
+    "rodovia_principal": "BR-101 (km 40) / BR-280 / SC-418",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/joinville/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Joinville – PCI/SRJOI",
+    "vinculacao": "Sede Regional (Joinville)",
+    "responsavel": "Superintendente Regional Iury Nunes Lopes",
+    "email": "srjoi@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Orestes Guimarães, 720 – Galeria de Lojas Beira Rio",
+        "telefone": "(47) 99271-3159",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Orestes Guimarães, 720 – Galeria de Lojas Beira Rio",
+        "telefone": "(47) 99271-3159",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Orestes Guimarães, 720 – Galeria de Lojas Beira Rio",
+        "telefone": "(47) 99271-3159",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "lages",
+    "municipio": "Lages",
+    "ibge_code": "4209300",
+    "latitude": -27.8157,
+    "longitude": -50.326,
+    "rodovia_principal": "BR-282 (km 215) / BR-116 (km 245) / SC-114",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/lages/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Lages – PCI/SRLGS",
+    "vinculacao": "Sede Regional (Lages)",
+    "responsavel": "Superintendente Regional Juliana Stefani Monteiro",
+    "email": "srlgs@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Alcinda Passos Varela, 325 – Universitário",
+        "telefone": "(49) 3289-8370",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Alcinda Passos Varela, 325 – Universitário",
+        "telefone": "(49) 3289-8370",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Alcinda Passos Varela, 325 – Universitário",
+        "telefone": "(49) 3289-8370",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "laguna",
+    "municipio": "Laguna",
+    "ibge_code": "4209409",
+    "latitude": -28.4819,
+    "longitude": -48.7806,
+    "rodovia_principal": "BR-101 (Ponte Anita Garibaldi) / SC-100",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/laguna/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Laguna – PCI/SRCRI/NRLAG",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Criciúma Perito Regional João Guilherme Gomes Aguiar nrlag",
+    "responsavel": "Perito Regional João Guilherme Gomes Aguiar",
+    "email": "nrlag@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Coronel Fernandes Martins, 330 – Progresso",
+        "telefone": "(48) 3647-7808",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Coronel Fernandes Martins, 330 – Progresso",
+        "telefone": "(48) 3647-7808",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Coronel Fernandes Martins, 330 – Progresso",
+        "telefone": "(48) 3647-7808",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "mafra",
+    "municipio": "Mafra",
+    "ibge_code": "4210100",
+    "latitude": -26.1136,
+    "longitude": -49.8058,
+    "rodovia_principal": "BR-116 (km 4) / BR-280 (Planalto Norte)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/mafra/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Mafra – PCI/SRJOI/NRMAF",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Joinville Perito Regional Allison Durigan Ganzert nrmaf",
+    "responsavel": "Perito Regional Allison Durigan Ganzert",
+    "email": "nrmaf@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida Prefeito Frederico Heyse, 639 – Centro",
+        "telefone": "(47) 3647-0376",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Avenida Prefeito Frederico Heyse, 639 – Centro",
+        "telefone": "(47) 3647-0376",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida Prefeito Frederico Heyse, 639 – Centro",
+        "telefone": "(47) 3647-0376",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "palhoca",
+    "municipio": "Palhoça",
+    "ibge_code": "4211900",
+    "latitude": -27.6455,
+    "longitude": -48.6689,
+    "rodovia_principal": "BR-101 (km 212) / BR-282 (Trevo Palhoça)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/palhoca/",
+    "nome_unidade": "Superintendência Regional de Polícia Científica em Palhoça – PCI/SRPAL",
+    "vinculacao": "Sede Regional (Palhoça)",
+    "responsavel": "Superintendente Regional Carlos Augusto Nogueira Junior",
+    "email": "srpal@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua José Cosme Pamplona, 1447 – C",
+        "telefone": "(48) 99144-8416",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua José Cosme Pamplona, 1447 – C",
+        "telefone": "(48) 99144-8416",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua José Cosme Pamplona, 1447 – C",
+        "telefone": "(48) 99144-8416",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "porto-uniao",
+    "municipio": "Porto União",
+    "ibge_code": "4213609",
+    "latitude": -26.2383,
+    "longitude": -51.0783,
+    "rodovia_principal": "BR-280 / BR-153 (Divisa SC/PR)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/porto-uniao/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Porto União – PCI/SRCDR/NRPOU",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Caçador Perito Regional Leonardo Piluski Bilinski nrpou",
+    "responsavel": "Perito Regional Leonardo Piluski Bilinski",
+    "email": "nrpou@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Centro, Porto União - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Centro, Porto União - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Centro, Porto União - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "rio-do-sul",
+    "municipio": "Rio do Sul",
+    "ibge_code": "4214805",
+    "latitude": -27.2142,
+    "longitude": -49.6433,
+    "rodovia_principal": "BR-470 (km 140) / SC-350 (Alto Vale)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/rio-do-sul/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Rio do Sul – PCI/SRBLU/NRRDS",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Blumenau Perito Regional Murilo Augusto Cassolatti de Barros nrrds",
+    "responsavel": "Perito Regional Murilo Augusto Cassolatti de Barros",
+    "email": "nrrds@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Porto União, 50 – Centro de Atendimento ao Cidadão Armin Stassun",
+        "telefone": "(47) 3531-1235",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Porto União, 50 – Centro de Atendimento ao Cidadão Armin Stassun",
+        "telefone": "(47) 3531-1235",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Porto União, 50 – Centro de Atendimento ao Cidadão Armin Stassun",
+        "telefone": "(47) 3531-1235",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "sao-bento-do-sul",
+    "municipio": "São Bento do Sul",
+    "ibge_code": "4215802",
+    "latitude": -26.2503,
+    "longitude": -49.3789,
+    "rodovia_principal": "SC-418 / Acesso BR-280",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/sao-bento-do-sul/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em São Bento do Sul – PCI/SRJOI/NRSBS",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Joinville Perito Regional Rogério Aurich Bomvechio nrsbs",
+    "responsavel": "Perito Regional Rogério Aurich Bomvechio",
+    "email": "nrsbs@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida São Bento, esquina com Rua João Stoeberl, 710 – Rio Negro",
+        "telefone": "(47) 3647-0140",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Avenida São Bento, esquina com Rua João Stoeberl, 710 – Rio Negro",
+        "telefone": "(47) 3647-0140",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida São Bento, esquina com Rua João Stoeberl, 710 – Rio Negro",
+        "telefone": "(47) 3647-0140",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "sao-joaquim",
+    "municipio": "São Joaquim",
+    "ibge_code": "4216503",
+    "latitude": -28.2936,
+    "longitude": -49.9317,
+    "rodovia_principal": "SC-114 / SC-390 (Serra do Rio do Rastro)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/sao-joaquim/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em São Joaquim – PCI/SRLGS/NRSJQ",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Lages Perita Regional Tatiane Almeida Medeiros nrsjq",
+    "responsavel": "Perita Regional Tatiane Almeida Medeiros",
+    "email": "nrsjq@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Centro, São Joaquim - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Centro, São Joaquim - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Centro, São Joaquim - SC",
+        "telefone": "",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "sao-jose",
+    "municipio": "São José",
+    "ibge_code": "4216602",
+    "latitude": -27.6136,
+    "longitude": -48.6366,
+    "rodovia_principal": "BR-101 (km 205) / BR-282 (Continente)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/sao-jose/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em São José – PCI/SRPAL/NRSJS",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Palhoça Perito Regional Mateus Veit Braun nrsjs",
+    "responsavel": "Perito Regional Mateus Veit Braun",
+    "email": "nrsjs@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Gerôncio Thives, 1079 – Shopping Itaguaçu",
+        "telefone": "(48) 99171-2988",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Gerôncio Thives, 1079 – Shopping Itaguaçu",
+        "telefone": "(48) 99171-2988",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Gerôncio Thives, 1079 – Shopping Itaguaçu",
+        "telefone": "(48) 99171-2988",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "sao-lourenco-do-oeste",
+    "municipio": "São Lourenço do Oeste",
+    "ibge_code": "4216909",
+    "latitude": -26.3578,
+    "longitude": -52.8514,
+    "rodovia_principal": "SC-157 / SC-480 (Noroeste)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/sao-lourenco-do-oeste/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em São Lourenço do Oeste – PCI/SRCCO/NRSLO",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Chapecó Perito Regional Renan Locatelli nrslo",
+    "responsavel": "Perito Regional Renan Locatelli",
+    "email": "nrslo@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Avenida Brasil, 1097 – Centro",
+        "telefone": "(49) 3372-1141",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Avenida Brasil, 1097 – Centro",
+        "telefone": "(49) 3372-1141",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Avenida Brasil, 1097 – Centro",
+        "telefone": "(49) 3372-1141",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "sao-miguel-do-oeste",
+    "municipio": "São Miguel do Oeste",
+    "ibge_code": "4217204",
+    "latitude": -26.7264,
+    "longitude": -53.5186,
+    "rodovia_principal": "BR-282 / BR-163 (Extremo Oeste)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/sao-miguel-do-oeste/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em São Miguel do Oeste – PCI/SRCCO/NRSMO",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Chapecó Perito Regional Felipe Micoski Luz nrsmo",
+    "responsavel": "Perito Regional Felipe Micoski Luz",
+    "email": "nrsmo@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Marcílio Dias, nº 2633, Bairro São Luiz",
+        "telefone": "(49) 3631-3291",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Marcílio Dias, nº 2633, Bairro São Luiz",
+        "telefone": "(49) 3631-3291",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Marcílio Dias, nº 2633, Bairro São Luiz",
+        "telefone": "(49) 3631-3291",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "tubarao",
+    "municipio": "Tubarão",
+    "ibge_code": "4218707",
+    "latitude": -28.4739,
+    "longitude": -49.0069,
+    "rodovia_principal": "BR-101 (km 335) / SC-370",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/tubarao/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Tubarão – PCI/SRCRI/NRTUB",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Criciúma Perita Regional Jéssica Ceolin de Bona nrtub",
+    "responsavel": "Perita Regional Jéssica Ceolin de Bona",
+    "email": "nrtub@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Teresa Cristina, 236 – Oficinas",
+        "telefone": "(48) 3631-9965",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Teresa Cristina, 236 – Oficinas",
+        "telefone": "(48) 3631-9965",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Teresa Cristina, 236 – Oficinas",
+        "telefone": "(48) 3631-9965",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "videira",
+    "municipio": "Videira",
+    "ibge_code": "4219309",
+    "latitude": -27.0083,
+    "longitude": -51.1517,
+    "rodovia_principal": "SC-355 / SC-135 (Meio-Oeste)",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/videira/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Videira – PCI/SRCDR/NRVDA",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Caçador Perito Regional Carlos Henrique de Lima Winck nrvda",
+    "responsavel": "Perito Regional Carlos Henrique de Lima Winck",
+    "email": "nrvda@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Antônio Ferlin, 122 – Alvorada",
+        "telefone": "(49) 3533-5439",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Antônio Ferlin, 122 – Alvorada",
+        "telefone": "(49) 3533-5439",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Antônio Ferlin, 122 – Alvorada",
+        "telefone": "(49) 3533-5439",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  },
+  {
+    "slug": "xanxere",
+    "municipio": "Xanxerê",
+    "ibge_code": "4219507",
+    "latitude": -26.8747,
+    "longitude": -52.4036,
+    "rodovia_principal": "BR-282 (km 500) / SC-480",
+    "url_oficial": "https://www.policiacientifica.sc.gov.br/unidades/xanxere/",
+    "nome_unidade": "Núcleo Regional de Polícia Científica em Xanxerê – PCI/SRCCO/NRXXE",
+    "vinculacao": "Vinculado à Superintendência Regional de Polícia Científica em Chapecó Perito Regional Dionatan Vidal Lopes Machado nrxxe",
+    "responsavel": "Perito Regional Dionatan Vidal Lopes Machado",
+    "email": "nrxxe@policiacientifica.sc.gov.br",
+    "servicos": {
+      "medicina_legal": {
+        "disponivel": true,
+        "nome": "Medicina Legal (IML / Lesão Corporal / Necropsia)",
+        "endereco": "Rua Ângelo Bonfilio Corso, 422, Bairro Veneza, Xanxerê/SC – CEP 89820",
+        "telefone": "(49) 3382-2195",
+        "horario": "Segunda a Sexta – 08h às 12h / Plantão 24h"
+      },
+      "criminalistica": {
+        "disponivel": true,
+        "nome": "Criminalística e Perícias Forenses",
+        "endereco": "Rua Ângelo Bonfilio Corso, 422, Bairro Veneza, Xanxerê/SC – CEP 89820",
+        "telefone": "(49) 3382-2195",
+        "horario": "Segunda a Sexta – 13h às 18h / Perícia de Local 24h"
+      },
+      "identificacao": {
+        "disponivel": true,
+        "nome": "Identificação Civil e Criminal (CIN)",
+        "endereco": "Rua Ângelo Bonfilio Corso, 422, Bairro Veneza, Xanxerê/SC – CEP 89820",
+        "telefone": "(49) 3382-2195",
+        "horario": "Segunda a Sexta – 08h às 17h"
+      }
+    }
+  }
+]

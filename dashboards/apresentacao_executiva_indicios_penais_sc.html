@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pitch Executivo • Dashboard de Inteligência e Decisão Logística em SC</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      letter-spacing: -0.01em;
+    }
+    
+    .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.03em;
+    }
+
+    .flat-card {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 28px;
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+    
+    .slide-section {
+      display: none;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+    
+    .slide-section.active {
+      display: flex;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white antialiased bg-slate-50">
+
+  <!-- ==================================================================== -->
+  <!-- BARRA SUPERIOR MINIMALISTA: APENAS NUMERAÇÃO E NAVEGAÇÃO             -->
+  <!-- ==================================================================== -->
+  <header class="w-full border-b border-slate-200 bg-white/90 backdrop-blur px-6 sm:px-12 py-4 flex items-center justify-between">
+    <div></div>
+
+    <!-- NUMERAÇÃO E NAVEGAÇÃO -->
+    <div class="flex items-center space-x-5">
+      <span class="font-mono text-lg font-bold text-blue-600 tracking-wider">
+        <span id="currentSlideIndicator">01</span> / 14
+      </span>
+      <div class="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1">
+        <button onclick="prevSlide()" class="p-2 hover:bg-white text-slate-700 hover:text-slate-950 rounded-lg transition shadow-sm" title="Anterior (←)">
+          <i data-lucide="chevron-left" class="w-6 h-6"></i>
+        </button>
+        <button onclick="nextSlide()" class="p-2 hover:bg-white text-slate-700 hover:text-slate-950 rounded-lg transition shadow-sm" title="Próximo (→ / Espaço)">
+          <i data-lucide="chevron-right" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <button onclick="toggleFullScreen()" class="text-slate-500 hover:text-slate-950 p-2 rounded-xl hover:bg-slate-100 transition" title="Tela Cheia">
+        <i data-lucide="maximize-2" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- LINHA DE PROGRESSO FLAT -->
+  <div class="w-full bg-slate-200 h-2">
+    <div id="slideProgressBar" class="h-full bg-blue-600 transition-all duration-300 w-[7.14%]"></div>
+  </div>
+
+  <!-- CONTAINER CENTRAL DOS SLIDES -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-6 sm:px-12 py-10 flex items-center justify-center">
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 1: CAPA                                                      -->
+    <!-- ================================================================== -->
+    <section id="slide-1" class="slide-section active flex-col justify-center w-full space-y-10">
+      <div class="space-y-6">
+        <div class="inline-flex items-center space-x-2 text-blue-600 font-bold text-base tracking-widest uppercase">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          <span>Grupo 03</span>
+        </div>
+        <h1 class="text-6xl sm:text-7xl lg:text-8xl font-display font-extrabold text-slate-950 tracking-tight leading-none max-w-5xl">
+          Dashboard Interativo para Decisão Logística
+        </h1>
+        <p class="text-2xl sm:text-3xl text-slate-600 max-w-4xl font-normal leading-relaxed">
+          Dados em nuvem esquematizados, limpos e georreferenciados para direcionar recursos e operações em Santa Catarina.
+        </p>
+        <div class="text-base font-semibold text-slate-400 uppercase tracking-wider">
+          Recorte Oficial: 2021 a 2026
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-6 pt-4">
+        <button onclick="nextSlide()" class="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg sm:text-xl px-10 py-5 rounded-2xl shadow-lg shadow-blue-600/20 transition">
+          <span>Iniciar Apresentação</span>
+          <i data-lucide="arrow-right" class="w-6 h-6"></i>
+        </button>
+        <span class="text-base text-slate-500 font-medium">Navegue com <kbd class="px-2.5 py-1 bg-white border border-slate-200 rounded font-mono text-slate-700">→</kbd> ou <kbd class="px-2.5 py-1 bg-white border border-slate-200 rounded font-mono text-slate-700">Espaço</kbd></span>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 2: PROBLEMA 1 - DECISÃO NO ESCURO                            -->
+    <!-- ================================================================== -->
+    <section id="slide-2" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-rose-600">01 • Problema</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Decisões Logísticas Sem Dados Centralizados
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flat-card p-10 sm:p-12 space-y-5 border-rose-200 bg-rose-50/30">
+          <div class="w-16 h-16 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center">
+            <i data-lucide="file-question" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-display font-bold text-slate-950">Alocação por Suposição</h3>
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
+            Viaturas, efetivo policial e recursos operacionais são historicamente distribuídos com base em percepção empírica ou apenas no volume bruto de grandes cidades.
+          </p>
+        </div>
+
+        <div class="flat-card p-10 sm:p-12 space-y-5 border-slate-200">
+          <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
+            <i data-lucide="database-zap" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-display font-bold text-slate-950">Dados Fragmentados</h3>
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
+            Bases federais, cadastros estaduais e dados demográficos do IBGE ficam isolados em relatórios estáticos, impedindo uma visão integrada da realidade operacional.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 3: PROBLEMA 2 - A DISTORÇÃO DOS NÚMEROS ABSOLUTOS            -->
+    <!-- ================================================================== -->
+    <section id="slide-3" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-rose-600">02 • Problema</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          A Ilusão dos Números Absolutos
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-6 sm:p-8 space-y-3">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-slate-400">Total (2021-2026)</div>
+          <div class="text-5xl sm:text-6xl font-display font-black text-slate-900">597k</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Ocorrências registradas e auditadas nos 295 municípios de Santa Catarina.</p>
+        </div>
+
+        <div class="flat-card p-6 sm:p-8 space-y-3">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-blue-600">Grandes Polos</div>
+          <div class="text-4xl sm:text-5xl font-display font-black text-blue-600 tracking-tight">Volume</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Florianópolis e Joinville lideram em quantidade bruta unicamente pela grande população.</p>
+        </div>
+
+        <div class="flat-card p-6 sm:p-8 space-y-3 border-rose-200 bg-rose-50/30">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-rose-600">Oeste & Planalto</div>
+          <div class="text-4xl sm:text-5xl font-display font-black text-rose-600 tracking-tight">Até 4x</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Taxas per capita a cada 10 mil hab revelam proporções severas de violência no interior.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 4: PROBLEMA 3 - O VAZIO PERICIAL E AS 72 HORAS               -->
+    <!-- ================================================================== -->
+    <section id="slide-4" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-rose-600">03 • Problema</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Vazio Territorial e o Risco das 72 Horas
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-6 sm:p-8 space-y-3 border-rose-200">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-rose-600">Vazio Pericial</div>
+          <div class="text-5xl sm:text-6xl font-display font-black text-rose-600">45</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Municípios estão a mais de <strong>50 km</strong> de um posto pericial da Polícia Científica em SC.</p>
+        </div>
+
+        <div class="flat-card p-6 sm:p-8 space-y-3">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-amber-600">Deslocamento</div>
+          <div class="text-5xl sm:text-6xl font-display font-black text-slate-900 tracking-tight">>1h30</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Tempo de viagem em rodovias estaduais para transporte de vítimas e diligências.</p>
+        </div>
+
+        <div class="flat-card p-6 sm:p-8 space-y-3 border-amber-200 bg-amber-50/30">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-amber-600">Janela Crítica</div>
+          <div class="text-5xl sm:text-6xl font-display font-black text-amber-600">72h</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Prazo em que vestígios físicos e provas de DNA se perdem sem atendimento próximo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 5: SOLUÇÃO 1 - O DASHBOARD INTERATIVO                        -->
+    <!-- ================================================================== -->
+    <section id="slide-5" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-blue-600">04 • Solução</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Dashboard Interativo para Tomada de Decisão
+        </h2>
+      </div>
+
+      <div class="flat-card p-10 sm:p-14 space-y-8 border-blue-200 bg-blue-50/20">
+        <div class="flex items-center space-x-6">
+          <div class="w-18 h-18 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 p-4 shadow-md shadow-blue-600/20">
+            <i data-lucide="layout-dashboard" class="w-10 h-10"></i>
+          </div>
+          <div>
+            <div class="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-950">Painel Central de Decisão Logística</div>
+            <p class="text-slate-600 text-lg sm:text-xl mt-2">Ambiente visual unificado que conecta indicadores, geolocalização e histórico de ocorrências.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-slate-200">
+          <div class="space-y-2">
+            <div class="text-base font-bold uppercase text-blue-600 tracking-wider">Visão Integrada</div>
+            <p class="text-lg text-slate-600 leading-relaxed">Visualização dinâmica dos 295 municípios com filtros por grupo vulnerável e gravidade.</p>
+          </div>
+          <div class="space-y-2">
+            <div class="text-base font-bold uppercase text-blue-600 tracking-wider">Apoio Operacional</div>
+            <p class="text-lg text-slate-600 leading-relaxed">Suporte direto a comandos policiais para planejar posicionamento de equipes e recursos.</p>
+          </div>
+          <div class="space-y-2">
+            <div class="text-base font-bold uppercase text-blue-600 tracking-wider">Simulação de Cenários</div>
+            <p class="text-lg text-slate-600 leading-relaxed">Análise de impacto territorial antes de remanejar esforços e firmar convênios locais.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 6: SOLUÇÃO 2 - GEORREFERENCIAÇÃO & MAPAS                     -->
+    <!-- ================================================================== -->
+    <section id="slide-6" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-blue-600">05 • Solução</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Georreferenciação & Inteligência Espacial
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+            <i data-lucide="map" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Malha Vetorial</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Mapeamento cartográfico preciso dos 295 municípios e das 7 Regiões Intermediárias oficiais do Estado.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="radio" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Raios de Cobertura</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Geocodificação das 30 unidades da Polícia Científica com zonas de atendimento (&lt;25km, 25-50km e &gt;50km).
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
+            <i data-lucide="navigation" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Picos Críticos</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Radares visuais nos municípios com maiores taxas per capita para orientar prioridades operacionais.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 7: SOLUÇÃO 3 - DADOS EM NUVEM LIMPOS E ORGANIZADOS           -->
+    <!-- ================================================================== -->
+    <section id="slide-7" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-blue-600">06 • Solução</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Dados em Nuvem Esquematizados e Limpos
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="text-base font-bold uppercase tracking-widest text-blue-600">1. Ingestão Oficial</div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Fontes Oficiais</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Unificação de microdados federais (ONDH), Censo IBGE 2022 e catálogo de delegacias da Polícia Civil.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="text-base font-bold uppercase tracking-widest text-indigo-600">2. Tratamento</div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Curadoria & LGPD</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Deduplicação, normalização per capita por 10k hab e anonimização estrita de dados sensíveis.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="text-base font-bold uppercase tracking-widest text-emerald-600">3. Disponibilização</div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Consulta em Nuvem</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Repositório analítico em nuvem seguro para acesso instantâneo pelos órgãos decisores de Santa Catarina.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 8: DIFERENCIAL 1 - TRIAGEM AUTOMÁTICA                        -->
+    <!-- ================================================================== -->
+    <section id="slide-8" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-emerald-600">07 • Diferencial</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Triagem Analítica de Tipicidade Penal vs. Social
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flat-card p-10 sm:p-12 space-y-5 border-rose-200 bg-rose-50/20">
+          <div class="flex items-center justify-between">
+            <span class="text-base font-bold uppercase tracking-widest text-rose-600">Demanda Penal</span>
+            <i data-lucide="shield" class="w-7 h-7 text-rose-600"></i>
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-display font-bold text-slate-950">Crimes Típicos (63,0% • 376k)</h3>
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
+            Identifica ocorrências que exigem inquérito policial e perícia técnica, permitindo concentrar a atuação policial nos casos mais relevantes.
+          </p>
+        </div>
+
+        <div class="flat-card p-10 sm:p-12 space-y-5 border-emerald-200 bg-emerald-50/20">
+          <div class="flex items-center justify-between">
+            <span class="text-base font-bold uppercase tracking-widest text-emerald-600">Demanda Assistencial</span>
+            <i data-lucide="users" class="w-7 h-7 text-emerald-600"></i>
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-display font-bold text-slate-950">Casos Sociais (37,0% • 221k)</h3>
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
+            Isola carências socioassistenciais, orientando parcerias com o CRAS/CREAS e evitando sobrecarga desnecessária na segurança pública.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 9: DIFERENCIAL 2 - SUPORTE OPERACIONAL DINÂMICO              -->
+    <!-- ================================================================== -->
+    <section id="slide-9" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-emerald-600">08 • Diferencial</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Da Planilha Estática à Decisão Interativa
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flat-card p-10 sm:p-12 space-y-5">
+          <div class="text-base font-bold uppercase tracking-widest text-slate-400">Antes • Relatório Estático</div>
+          <ul class="space-y-4 text-lg text-slate-600 leading-relaxed">
+            <li class="flex items-start space-x-3">
+              <span class="text-rose-500 font-bold">•</span>
+              <span>Dados presos em PDFs e tabelas sem mapa interativo.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <span class="text-rose-500 font-bold">•</span>
+              <span>Incapacidade de cruzar distâncias rodoviárias com população.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <span class="text-rose-500 font-bold">•</span>
+              <span>Decisões orçamentárias tomadas sem simulação visual.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="flat-card p-10 sm:p-12 space-y-5 border-blue-200 bg-blue-50/20">
+          <div class="text-base font-bold uppercase tracking-widest text-blue-600">Com o Dashboard Interativo</div>
+          <ul class="space-y-4 text-lg text-slate-700 leading-relaxed font-medium">
+            <li class="flex items-start space-x-3">
+              <i data-lucide="check" class="w-6 h-6 text-blue-600 shrink-0 mt-0.5"></i>
+              <span>Navegação dinâmica por municípios, grupos e comarcas.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <i data-lucide="check" class="w-6 h-6 text-blue-600 shrink-0 mt-0.5"></i>
+              <span>Cálculo automático de taxas per capita e matriz de distâncias.</span>
+            </li>
+            <li class="flex items-start space-x-3">
+              <i data-lucide="check" class="w-6 h-6 text-blue-600 shrink-0 mt-0.5"></i>
+              <span>Embasamento transparente e seguro para justificar recursos.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 10: TRAÇÃO 1 - BASE AUDITADA E PROCESSADA                    -->
+    <!-- ================================================================== -->
+    <section id="slide-10" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-blue-600">09 • Tração</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Base Histórica Recente e Auditada
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-6 sm:p-8 space-y-3">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-slate-400">Volume 2021-2026</div>
+          <div class="text-5xl sm:text-6xl font-display font-black text-slate-900">597k</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Registros limpos, deduplicados e consolidados em esquema colunar otimizado.</p>
+        </div>
+
+        <div class="flat-card p-6 sm:p-8 space-y-3">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-blue-600">Cobertura SC</div>
+          <div class="text-5xl sm:text-6xl font-display font-black text-blue-600">295</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Municípios 100% integrados com dados oficiais do Censo IBGE 2022.</p>
+        </div>
+
+        <div class="flat-card p-6 sm:p-8 space-y-3">
+          <div class="text-sm sm:text-base font-bold uppercase tracking-widest text-emerald-600">Integridade</div>
+          <div class="text-4xl sm:text-5xl font-display font-black text-emerald-600 tracking-tight">SHA-256</div>
+          <p class="text-base sm:text-lg text-slate-600 leading-relaxed">Certificação criptográfica registrada garantindo auditoria e conformidade.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 11: TRAÇÃO 2 - PROTÓTIPOS FUNCIONAIS                         -->
+    <!-- ================================================================== -->
+    <section id="slide-11" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-blue-600">10 • Tração</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Soluções Entregues e Operacionais
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+            <i data-lucide="layout" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Dashboard Streamlit</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Painel interativo com 5 visões estratégicas, busca dinâmica e exportação auditada de dados.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="map-pinned" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Mapa Folium Oficial</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Camada cartográfica com os 10 picos territoriais e as 30 unidades da Polícia Científica.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
+            <i data-lucide="database" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Banco em Nuvem</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Estrutura dimensional modelada para consultas em milissegundos por qualquer secretaria.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 12: EQUIPE 1 - MULTIDISCIPLINAR                              -->
+    <!-- ================================================================== -->
+    <section id="slide-12" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-indigo-600">11 • Equipe</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Equipe Multidisciplinar para Execução
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+            <i data-lucide="server" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Engenharia de Dados</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Pipelines de ingestão automatizada, modelagem dimensional e arquiteturas em nuvem de alta escala.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="globe-2" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Inteligência Territorial</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Análise geoespacial, cálculo de matrizes rodoviárias e mapeamento vetorial avançado.
+          </p>
+        </div>
+
+        <div class="flat-card p-8 sm:p-10 space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
+            <i data-lucide="line-chart" class="w-7 h-7"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-display font-bold text-slate-950">Ciência de Dados</h3>
+          <p class="text-lg text-slate-600 leading-relaxed">
+            Classificadores de tipicidade penal, normalização per capita e visualizações estratégicas.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 13: EQUIPE 2 - GOVERNANÇA E METODOLOGIA                     -->
+    <!-- ================================================================== -->
+    <section id="slide-13" class="slide-section flex-col justify-center w-full space-y-8">
+      <div class="space-y-3">
+        <span class="text-base font-bold uppercase tracking-widest text-indigo-600">12 • Equipe</span>
+        <h2 class="text-5xl sm:text-6xl font-display font-extrabold text-slate-950">
+          Metodologia e Rigor de Governança
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flat-card p-10 sm:p-12 space-y-5">
+          <div class="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+            <i data-lucide="lock" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-display font-bold text-slate-950">Conformidade Estrita com a LGPD</h3>
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
+            Anonimização e pseudonimização de dados de menores e testemunhas. Camadas analíticas agregadas desenhadas para uso estratégico sem expor indivíduos.
+          </p>
+        </div>
+
+        <div class="flat-card p-10 sm:p-12 space-y-5">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="check-check" class="w-8 h-8"></i>
+          </div>
+          <h3 class="text-3xl sm:text-4xl font-display font-bold text-slate-950">Reprodutibilidade & Auditoria</h3>
+          <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
+            Pipelines automatizados de ponta a ponta com documentação formal, permitindo que cada indicador seja auditado por órgãos de controle e secretarias.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    
+
+
+    <!-- ================================================================== -->
+    <!-- SLIDE 14: ENCERRAMENTO                                             -->
+    <!-- ================================================================== -->
+    <section id="slide-14" class="slide-section flex-col justify-center items-center text-center w-full space-y-10 py-12">
+      <div class="space-y-6 max-w-4xl">
+        <div class="inline-flex items-center space-x-2 text-blue-600 font-bold text-base tracking-widest uppercase">
+          <i data-lucide="check-circle" class="w-5 h-5"></i>
+          <span>Grupo 03</span>
+        </div>
+        <h1 class="text-6xl sm:text-7xl lg:text-8xl font-display font-extrabold text-slate-950 tracking-tight leading-tight">
+          Muito Obrigado
+        </h1>
+        <p class="text-2xl sm:text-3xl text-slate-600 font-normal leading-relaxed max-w-3xl mx-auto">
+          Inteligência de dados e georreferenciação a serviço da segurança pública e da proteção social em Santa Catarina.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-5 pt-4">
+        <a href="dashboard_sc_disque100_folium.html" target="_blank" class="inline-flex items-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg sm:text-xl px-10 py-5 rounded-2xl shadow-lg shadow-blue-600/20 transition">
+          <i data-lucide="map" class="w-6 h-6"></i>
+          <span>Abrir Mapa Georreferenciado</span>
+        </a>
+        <button onclick="goToSlide(1)" class="inline-flex items-center space-x-3 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-semibold text-lg sm:text-xl px-10 py-5 rounded-2xl transition shadow-sm">
+          <i data-lucide="rotate-ccw" class="w-6 h-6 text-slate-500"></i>
+          <span>Reiniciar Apresentação</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================================================================== -->
+  <!-- SCRIPT DE NAVEGAÇÃO E CONTROLE                                       -->
+  <!-- ==================================================================== -->
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 14;
+
+    function updatePresentationUI() {
+      document.getElementById('currentSlideIndicator').innerText = String(currentSlide).padStart(2, '0');
+
+      for (let i = 1; i <= totalSlides; i++) {
+        const slideEl = document.getElementById(`slide-${i}`);
+        if (slideEl) {
+          if (i === currentSlide) {
+            slideEl.classList.add('active');
+          } else {
+            slideEl.classList.remove('active');
+          }
+        }
+      }
+
+      const progressPercent = (currentSlide / totalSlides) * 100;
+      document.getElementById('slideProgressBar').style.width = `${progressPercent}%`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updatePresentationUI();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updatePresentationUI();
+      }
+    }
+
+    function goToSlide(n) {
+      if (n >= 1 && n <= totalSlides) {
+        currentSlide = n;
+        updatePresentationUI();
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    // Atalhos de teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        goToSlide(totalSlides);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updatePresentationUI();
+    });
+  </script>
+</body>
+</html>

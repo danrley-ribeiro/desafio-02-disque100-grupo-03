@@ -1,0 +1,19 @@
+{
+  "timestamp_auditoria": "2026-09-08 14:31:37",
+  "total_registros_sc": 699029,
+  "total_penal": 428165,
+  "total_social": 270864,
+  "totais_por_grupo": {
+    "criancas_e_adolescentes": 329488,
+    "mulheres_violencia_genero": 20682,
+    "pessoas_idosas": 214621,
+    "pessoas_com_deficiencia": 100557,
+    "populacao_lgbtqia": 11844,
+    "sistema_prisional_e_rua": 18894
+  },
+  "arquivos_hashes_sha256": {
+    "sc_fato_denuncias.parquet": "cf136739803d1da8022b5cce79d7196e0f789a346de69b315564cd89ffa335fa",
+    "sc_kpis_grupos_municipios.parquet": "38496a74658e03a21462b2df77d641c84ce54b2b79b2c4942f918dd308157155"
+  },
+  "status": "APROVADO_AUDITORIA_INTEGRIDADE"
+}

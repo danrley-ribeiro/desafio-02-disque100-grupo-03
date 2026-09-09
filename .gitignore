@@ -1,0 +1,63 @@
+# =============================================================================
+# Arquivos e Diretórios Ocultos (.alguma-coisa)
+# =============================================================================
+# Ignorar todos os arquivos e diretórios iniciados por ponto (.alguma-coisa)
+.*
+
+# Exceção: Preservar o próprio .gitignore
+!.gitignore
+
+# =============================================================================
+# Detalhamento Explícito de Ambientes, Caches e Ferramentas
+# =============================================================================
+# Ambientes Virtuais Python
+.venv/
+env/
+venv/
+ENV/
+.Python
+
+# Caches de Compilação e Execução Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Configurações de Agentes e Ferramentas Locais
+.agents/
+
+# Perfis e Dados Temporários de Navegador / Testes
+.chrome_profile/
+*.log
+
+# Streamlit Local (credenciais e configurações de usuário)
+.streamlit/
+
+# Dependências Node.js
+node_modules/
+
+# Variáveis de Ambiente e Chaves de API / Segredos
+.env
+.env.*
+*.env
+
+# Evidências e Capturas Visuais de Testes
+tests/*.png
+
+# Sistema Operacional e Editores
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
