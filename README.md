@@ -35,8 +35,7 @@ desafio-02-disque100-grupo-03/
 ├── dashboards/      # Painel Streamlit e mapas/relatórios interativos em HTML
 ├── data/            # Data Lakehouse (Bronze: dados brutos, Prata: tratados, Ouro: DuckDB/SQLite)
 ├── notebooks/       # Jupyter Notebook com análise exploratória completa
-├── scripts/         # Pipelines ETL de ingestão, triagem penal e agregação
-└── tests/           # Scripts de validação e testes visuais
+└── scripts/         # Pipelines ETL de ingestão, triagem penal e agregação
 ```
 
 ---

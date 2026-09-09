@@ -8,16 +8,13 @@
 !.gitignore
 
 # =============================================================================
-# Detalhamento Explícito de Ambientes, Caches e Ferramentas
+# Ambientes Virtuais, Caches e Ferramentas Python
 # =============================================================================
-# Ambientes Virtuais Python
 .venv/
 env/
 venv/
 ENV/
 .Python
-
-# Caches de Compilação e Execução Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -26,29 +23,20 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .ipynb_checkpoints/
-
-# Configurações de Agentes e Ferramentas Locais
-.agents/
-
-# Perfis e Dados Temporários de Navegador / Testes
-.chrome_profile/
 *.log
 
-# Streamlit Local (credenciais e configurações de usuário)
+# =============================================================================
+# Configurações de Usuário, Agentes e Variáveis Locais
+# =============================================================================
+.agents/
 .streamlit/
-
-# Dependências Node.js
-node_modules/
-
-# Variáveis de Ambiente e Chaves de API / Segredos
 .env
 .env.*
 *.env
 
-# Evidências e Capturas Visuais de Testes
-tests/*.png
-
+# =============================================================================
 # Sistema Operacional e Editores
+# =============================================================================
 .DS_Store
 .DS_Store?
 ._*
