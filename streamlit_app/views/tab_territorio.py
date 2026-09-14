@@ -176,12 +176,26 @@ def render_tab_territorio(
             "recorte escolhido na barra lateral."
         )
         if html_folium:
-            components.html(_injetar_config(html_folium, filtros), height=640, scrolling=False)
+            _embutir_html(_injetar_config(html_folium, filtros), altura=640)
         else:
             st.warning(
                 "Arquivo não encontrado. Execute "
                 "`python3 scripts/generate_sc_disque100_folium_dashboard.py`."
             )
+
+
+def _embutir_html(html: str, *, altura: int) -> None:
+    """
+    Embute o HTML do mapa pré-gerado.
+
+    `st.components.v1.html` está depreciado e será removido; `st.iframe` é o
+    substituto, mas só existe a partir do Streamlit 1.49. A escolha é feita em
+    tempo de execução para que o painel funcione em ambas as versões.
+    """
+    if hasattr(st, "iframe"):
+        st.iframe(html, height=altura, width="stretch")
+    else:
+        components.html(html, height=altura, scrolling=False)
 
 
 def _render_mapa(

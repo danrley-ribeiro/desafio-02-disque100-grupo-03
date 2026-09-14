@@ -6,6 +6,12 @@ secondaryBackgroundColor = "#f4f4f1"
 textColor = "#0b0b0b"
 font = "sans serif"
 
+[client]
+# Esconde as opções de desenvolvedor da barra superior: Deploy, rerun e limpar
+# cache. Não remove o ícone do GitHub no Community Cloud, que aparece por o
+# repositório ser público e não é controlado por configuração.
+toolbarMode = "viewer"
+
 [browser]
 gatherUsageStats = false
 
