@@ -162,7 +162,7 @@ def discover_theme_tables(theme_item: Dict, session: requests.Session) -> List[D
                 "download_url": download_url
             })
     except Exception as e:
-        console.print(f"[yellow]⚠️ Erro ao varrer página do tema '{theme}': {e}[/yellow]")
+        console.print(f"[yellow]Erro ao varrer página do tema '{theme}': {e}[/yellow]")
 
     return tables
 
@@ -224,7 +224,7 @@ def download_and_convert_table(
         if not keep_csv and csv_path.exists():
             csv_path.unlink(missing_ok=True)
 
-        progress.update(task_id, description="[bold green]Concluído e Validado ✅")
+        progress.update(task_id, description="[bold green]Concluído e Validado ")
         return (base_name, "SUCESSO")
     except Exception as e:
         progress.update(task_id, description=f"[red]Erro conversão: {str(e)[:15]}")
@@ -255,7 +255,7 @@ def main():
     console.print("[bold]1. Mapeando tabelas disponíveis nas 9 páginas temáticas...[/bold]")
     all_tables = []
     
-    table_summary = Table(title="\n📊 Páginas Temáticas Mapeadas", border_style="blue")
+    table_summary = Table(title="\nPáginas Temáticas Mapeadas", border_style="blue")
     table_summary.add_column("Tema", style="bold")
     table_summary.add_column("Tabelas Encontradas", style="green", justify="center")
 
@@ -265,7 +265,7 @@ def main():
         table_summary.add_row(theme_item["title"], f"{len(discovered)} tabelas")
 
     console.print(table_summary)
-    console.print(f"[bold green]✨ Total de tabelas localizadas:[/bold green] [bold]{len(all_tables)} tabelas CSV[/bold].\n")
+    console.print(f"[bold green]Total de tabelas localizadas:[/bold green] [bold]{len(all_tables)} tabelas CSV[/bold].\n")
 
     # 2. Identifica as que já foram convertidas
     pending_tables = []
@@ -281,10 +281,10 @@ def main():
     console.print(f" • [yellow]Pendentes a processar:[/yellow] {len(pending_tables)} tabelas\n")
 
     if not pending_tables:
-        console.print("[bold green]🎉 Todas as 148 tabelas temáticas já estão baixadas e convertidas para Parquet![/bold green]")
+        console.print("[bold green]Todas as 148 tabelas temáticas já estão baixadas e convertidas para Parquet![/bold green]")
         return
 
-    console.print(f"[bold yellow]🚀 Iniciando processamento paralelo ({args.workers} workers)...[/bold yellow]\n")
+    console.print(f"[bold yellow]Iniciando processamento paralelo ({args.workers} workers)...[/bold yellow]\n")
 
     executor = ThreadPoolExecutor(max_workers=args.workers)
     try:
@@ -324,7 +324,7 @@ def main():
                     progress.update(task_map[t["base_name"]], description=f"[red]Erro: {e}")
 
     except KeyboardInterrupt:
-        console.print("\n[bold yellow]⚠️ Interrompido pelo usuário (Ctrl+C). Cancelando com segurança...[/bold yellow]")
+        console.print("\n[bold yellow]Interrompido pelo usuário (Ctrl+C). Cancelando com segurança...[/bold yellow]")
         executor.shutdown(wait=False, cancel_futures=True)
         for part in output_dir.rglob("*.part"):
             try:
@@ -335,7 +335,7 @@ def main():
     finally:
         executor.shutdown(wait=False)
 
-    console.print(f"\n[bold green]✅ Processo concluído! Todas as tabelas foram salvas em:[/bold green] [bold cyan]{output_dir}[/bold cyan]")
+    console.print(f"\n[bold green]Processo concluído! Todas as tabelas foram salvas em:[/bold green] [bold cyan]{output_dir}[/bold cyan]")
 
 if __name__ == "__main__":
     main()

@@ -66,13 +66,13 @@ TOPICS_MAP = {
 }
 
 TOPIC_ICONS = {
-    "total": "🚨",
-    "crianca": "👶",
-    "mulher": "👩",
-    "idoso": "👴",
-    "pcd": "♿",
-    "lgbt": "🏳️‍🌈",
-    "preso": "⛓️"
+    "total": "",
+    "crianca": "",
+    "mulher": "",
+    "idoso": "",
+    "pcd": "",
+    "lgbt": "",
+    "preso": ""
 }
 
 REGION_METADATA = {
@@ -213,15 +213,15 @@ def fetch_sc_population_censo_2022() -> Dict[str, int]:
     cache_file = next((p for p in cache_candidates if p.exists()), cache_candidates[0])
     if cache_file and cache_file.exists():
         try:
-            print(f"👥 Carregando população oficial dos 295 municípios de SC do cache local ({cache_file.name})...")
+            print(f"Carregando população oficial dos 295 municípios de SC do cache local ({cache_file.name})...")
             with open(cache_file, "r", encoding="utf-8") as f:
                 pop_map = json.load(f)
                 if len(pop_map) >= 290:
                     return pop_map
         except Exception as e:
-            print(f"⚠️ Erro ao ler cache local de população: {e}")
+            print(f"Erro ao ler cache local de população: {e}")
 
-    print("👥 Obtendo população oficial dos 295 municípios de Santa Catarina (Censo 2022 via SIDRA)...")
+    print("Obtendo população oficial dos 295 municípios de Santa Catarina (Censo 2022 via SIDRA)...")
     url = "https://servicodados.ibge.gov.br/api/v3/agregados/4714/periodos/2022/variaveis/93?localidades=N6[N3[42]]"
     pop_map = {}
     try:
@@ -236,7 +236,7 @@ def fetch_sc_population_censo_2022() -> Dict[str, int]:
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(pop_map, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"⚠️ Erro ao consultar SIDRA: {e}")
+        print(f"Erro ao consultar SIDRA: {e}")
 
     fallback_defaults = {
         "4205407": 537213, "4209102": 616323, "4202404": 361261, "4216602": 270295,
@@ -258,7 +258,7 @@ def fetch_sc_population_censo_2022() -> Dict[str, int]:
 def process_disque100_sc_data(parquet_dir: Path, df_ibge_sc: pl.DataFrame, pop_map: Dict[str, int]) -> Dict[str, Any]:
     """Processa todos os 22 arquivos Parquet e calcula métricas completas por tópico e por habitante."""
     pqs = sorted(glob.glob(str(parquet_dir / "data" / "raw" / "disque100-*.parquet"))) or sorted(glob.glob(str(parquet_dir / "disque100-*.parquet")))
-    print(f"📊 Processando {len(pqs)} arquivos Parquet do Disque 100 para SC...")
+    print(f"Processando {len(pqs)} arquivos Parquet do Disque 100 para SC...")
 
     code_to_meta = {}
     name_to_code = {}
@@ -279,7 +279,7 @@ def process_disque100_sc_data(parquet_dir: Path, df_ibge_sc: pl.DataFrame, pop_m
     ]
     kpi_file = next((p for p in kpi_candidates if p.exists()), None)
     if kpi_file and kpi_file.exists():
-        print(f"⚡ Carregando dados pré-processados e auditados de {kpi_file.name}...")
+        print(f"Carregando dados pré-processados e auditados de {kpi_file.name}...")
         df_kpi = pl.read_csv(kpi_file)
         json_candidates = [
             parquet_dir / "data" / "processed" / "sc_distribuicao_penal_metricas.json",
@@ -547,7 +547,7 @@ def compute_peaks_and_centroids(
     de pico para cada tipo de incidente com proporção referenciada a cada 10k de habitantes.
     Identifica também a concentração espacial e clusters regionais dos picos.
     """
-    print("🎯 Identificando centróides geográficos e os 10 pontos de pico por tipo de incidente (proporção / 10k hab)...")
+    print("Identificando centróides geográficos e os 10 pontos de pico por tipo de incidente (proporção / 10k hab)...")
     centroids = {}
     for f in geojson_sc["features"]:
         cid = str(f["properties"]["codarea"])
@@ -644,7 +644,7 @@ def compute_peaks_and_centroids(
                 "taxa_anual_10k": item["taxa_anual_10k"],
                 "lat": item["lat"],
                 "lng": item["lng"],
-                "icon": TOPIC_ICONS.get(top_key, "🚨"),
+                "icon": TOPIC_ICONS.get(top_key, ""),
                 "pci_proxima": pci_desc,
                 "rodovias": rodovias[:4],
                 "regional_concentration": concentration_desc
@@ -664,32 +664,16 @@ def compute_peaks_and_centroids(
 
 
 def build_roads_geojson() -> List[Dict[str, Any]]:
-    """Gera traçados vetoriais precisos das principais rodovias Federais (BR) e Estaduais (SC)."""
-    return [
-        # RODOVIAS FEDERAIS (BRs)
-        {"nome": "BR-101 (Eixo Litoral Norte-Sul)", "tipo": "federal", "coords": [[-26.00, -48.62], [-26.25, -48.82], [-26.90, -48.66], [-27.12, -48.60], [-27.59, -48.62], [-27.65, -48.67], [-28.28, -48.70], [-28.47, -49.00], [-28.67, -49.30], [-28.94, -49.49], [-29.32, -49.72]], "color": "#ef4444", "weight": 3.8},
-        {"nome": "BR-282 (Eixo Transversal Leste-Oeste)", "tipo": "federal", "coords": [[-27.60, -48.58], [-27.65, -48.67], [-27.70, -49.10], [-27.75, -49.50], [-27.81, -50.32], [-27.40, -51.22], [-27.17, -51.50], [-26.87, -52.40], [-27.10, -52.61], [-26.72, -53.51]], "color": "#f97316", "weight": 3.8},
-        {"nome": "BR-470 (Eixo Vale do Itajaí / Portos)", "tipo": "federal", "coords": [[-26.88, -48.65], [-26.90, -48.80], [-26.91, -49.06], [-27.05, -49.30], [-27.21, -49.64], [-27.12, -50.15], [-27.28, -50.58], [-27.40, -51.22]], "color": "#eab308", "weight": 3.8},
-        {"nome": "BR-116 (Eixo Planalto Norte-Sul)", "tipo": "federal", "coords": [[-26.11, -49.80], [-26.50, -50.10], [-26.90, -50.25], [-27.81, -50.32], [-28.30, -50.60]], "color": "#8b5cf6", "weight": 3.8},
-        {"nome": "BR-280 (Eixo Norte / Porto São Francisco)", "tipo": "federal", "coords": [[-26.24, -48.63], [-26.30, -48.84], [-26.48, -49.07], [-26.35, -49.40], [-26.11, -49.80], [-26.17, -50.39], [-26.23, -51.07]], "color": "#06b6d4", "weight": 3.8},
-        {"nome": "BR-153 (Transbrasiliana)", "tipo": "federal", "coords": [[-26.10, -51.05], [-26.70, -51.50], [-27.23, -52.02], [-27.40, -52.10]], "color": "#ec4899", "weight": 3.2},
-        {"nome": "BR-163 (Extremo Oeste)", "tipo": "federal", "coords": [[-26.25, -53.60], [-26.72, -53.51], [-27.10, -53.60]], "color": "#d946ef", "weight": 3.2},
+    """
+    Eixos rodoviarios de referencia, definidos em `scripts/eixos_rodoviarios_sc.py`.
 
-        # RODOVIAS ESTADUAIS (SCs)
-        {"nome": "SC-401 (Norte da Ilha - Florianópolis)", "tipo": "estadual", "coords": [[-27.58, -48.54], [-27.50, -48.50], [-27.43, -48.45]], "color": "#3b82f6", "weight": 3.0},
-        {"nome": "SC-405 (Sul da Ilha - Florianópolis / Aeroporto)", "tipo": "estadual", "coords": [[-27.60, -48.53], [-27.68, -48.51], [-27.75, -48.50]], "color": "#3b82f6", "weight": 3.0},
-        {"nome": "SC-108 (Joinville - Blumenau - Brusque - Criciúma)", "tipo": "estadual", "coords": [[-26.30, -48.84], [-26.48, -49.00], [-26.91, -49.06], [-27.09, -48.91], [-28.10, -49.20], [-28.67, -49.37]], "color": "#10b981", "weight": 3.0},
-        {"nome": "SC-486 (Itajaí - Brusque)", "tipo": "estadual", "coords": [[-26.90, -48.66], [-27.00, -48.78], [-27.09, -48.91]], "color": "#10b981", "weight": 3.0},
-        {"nome": "SC-350 (Rio do Sul - Ituporanga - Caçador)", "tipo": "estadual", "coords": [[-27.21, -49.64], [-27.41, -49.60], [-26.77, -51.01]], "color": "#14b8a6", "weight": 3.0},
-        {"nome": "SC-355 (Videira - Fraiburgo - Lebon Régis)", "tipo": "estadual", "coords": [[-27.00, -51.15], [-27.02, -50.92], [-26.92, -50.69]], "color": "#14b8a6", "weight": 3.0},
-        {"nome": "SC-114 (Lages - São Joaquim - Taió)", "tipo": "estadual", "coords": [[-27.11, -49.99], [-27.81, -50.32], [-28.29, -49.93]], "color": "#6366f1", "weight": 3.0},
-        {"nome": "SC-390 (Serra do Rio do Rastro: São Joaquim - Tubarão)", "tipo": "estadual", "coords": [[-28.29, -49.93], [-28.39, -49.56], [-28.47, -49.00]], "color": "#6366f1", "weight": 3.0},
-        {"nome": "SC-445 (Criciúma - Balneário Rincão / Acesso BR-101)", "tipo": "estadual", "coords": [[-28.67, -49.37], [-28.75, -49.28], [-28.83, -49.23]], "color": "#0ea5e9", "weight": 3.0},
-        {"nome": "SC-283 (Chapecó - Seara - Concórdia)", "tipo": "estadual", "coords": [[-27.10, -52.61], [-27.15, -52.31], [-27.23, -52.02]], "color": "#84cc16", "weight": 3.0},
-        {"nome": "SC-157 (Chapecó - Coronel Freitas - São Lourenço do Oeste)", "tipo": "estadual", "coords": [[-27.10, -52.61], [-26.90, -52.70], [-26.35, -52.85]], "color": "#84cc16", "weight": 3.0},
-        {"nome": "SC-480 (Chapecó - Goio-Ên / Divisa RS)", "tipo": "estadual", "coords": [[-27.10, -52.61], [-27.25, -52.60], [-27.35, -52.65]], "color": "#84cc16", "weight": 3.0},
-        {"nome": "SC-418 (Serra Dona Francisca: Joinville - São Bento do Sul)", "tipo": "estadual", "coords": [[-26.30, -48.84], [-26.23, -49.05], [-26.25, -49.37]], "color": "#a855f7", "weight": 3.0}
-    ]
+    A definicao saiu deste arquivo para um modulo proprio, de modo que o painel
+    Streamlit e este mapa pre-gerado desenhem exatamente os mesmos eixos. Os
+    tracados sao esquematicos, e nao a geometria oficial do DNIT ou do DEINFRA.
+    """
+    from eixos_rodoviarios_sc import eixos_como_geojson
+
+    return eixos_como_geojson()
 
 
 def generate_interactive_dashboard(
@@ -701,7 +685,7 @@ def generate_interactive_dashboard(
     output_path: Path
 ):
     """Gera o dashboard Folium dinâmico com reatividade client-side via Leaflet/JS."""
-    print("🗺️ Montando Dashboard Dinâmico em Folium com Camada de Pontos de Pico...")
+    print("Montando Dashboard Dinâmico em Folium com Camada de Pontos de Pico...")
 
     by_mun_data = sc_data["by_mun_data"]
     reg_data = sc_data["reg_data"]
@@ -1022,7 +1006,7 @@ def generate_interactive_dashboard(
         <!-- CONTROLES E FILTROS DINÂMICOS -->
         <!-- ================================================================= -->
         <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 14px; margin-bottom: 16px;">
-            <div style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">⚙️ Controles & Filtros Interativos</div>
+            <div style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Controles & Filtros Interativos</div>
 
             <!-- 1. Filtro de Nível Territorial -->
             <div style="margin-bottom: 12px;">
@@ -1038,11 +1022,11 @@ def generate_interactive_dashboard(
             <div style="margin-bottom: 12px;">
                 <label style="font-size: 11px; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Métrica de Análise:</label>
                 <select id="select-metric" onchange="updateDashboardView()" style="width: 100%; background: #0f172a; color: #f8fafc; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 600; cursor: pointer; outline: none;">
-                    <option value="total_10k" selected>🔥 Proporção: Total a cada 10k hab (Referência de Picos)</option>
-                    <option value="taxa_anual_10k">📅 Taxa Anual por 10k Habitantes</option>
-                    <option value="taxa_anual_100k">📈 Taxa Anual por 100k Habitantes (Censo 2022)</option>
-                    <option value="total">📊 Total Histórico Acumulado (2011–2026)</option>
-                    <option value="media_anual">📅 Média Anual de Denúncias</option>
+                    <option value="total_10k" selected>Proporção: Total a cada 10k hab (Referência de Picos)</option>
+                    <option value="taxa_anual_10k">Taxa Anual por 10k Habitantes</option>
+                    <option value="taxa_anual_100k">Taxa Anual por 100k Habitantes (Censo 2022)</option>
+                    <option value="total">Total Histórico Acumulado (2011–2026)</option>
+                    <option value="media_anual">Média anual de registros de violação</option>
                 </select>
             </div>
 
@@ -1050,13 +1034,13 @@ def generate_interactive_dashboard(
             <div style="margin-bottom: 12px;">
                 <label style="font-size: 11px; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Tipo de Incidente / Grupo Vulnerável:</label>
                 <select id="select-topic" onchange="updateDashboardView()" style="width: 100%; background: #0f172a; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer; outline: none;">
-                    <option value="total">🚨 Todos os Incidentes (Visão Geral)</option>
-                    <option value="crianca">👶 Crianças e Adolescentes (ECA)</option>
-                    <option value="mulher">👩 Mulheres (Violência de Gênero)</option>
-                    <option value="idoso">👴 Pessoas Idosas (Estatuto do Idoso)</option>
-                    <option value="pcd">♿ Pessoas com Deficiência (PCD)</option>
-                    <option value="lgbt">🏳️‍🌈 População LGBTQIA+</option>
-                    <option value="preso">⛓️ Sistema Prisional e Situação de Rua</option>
+                    <option value="total">Todos os Incidentes (Visão Geral)</option>
+                    <option value="crianca">Crianças e Adolescentes (ECA)</option>
+                    <option value="mulher">Mulheres (Violência de Gênero)</option>
+                    <option value="idoso">Pessoas Idosas (Estatuto do Idoso)</option>
+                    <option value="pcd">Pessoas com Deficiência (PCD)</option>
+                    <option value="lgbt">População LGBTQIA+</option>
+                    <option value="preso">Sistema Prisional e Situação de Rua</option>
                 </select>
             </div>
 
@@ -1066,15 +1050,15 @@ def generate_interactive_dashboard(
                 <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                     <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #fbbf24; font-weight: 700;">
                         <input type="checkbox" id="chk-peaks" checked onchange="togglePeaksLayer(this.checked)">
-                        <span>🔥 10 Pontos de Pico (10k hab)</span>
+                        <span>10 Pontos de Pico (10k hab)</span>
                     </label>
                     <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #e2e8f0;">
                         <input type="checkbox" id="chk-pci" checked onchange="togglePCILayer(this.checked)">
-                        <span>🔬 30 Unidades PCI-SC</span>
+                        <span>30 Unidades PCI-SC</span>
                     </label>
                     <label style="font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #e2e8f0;">
                         <input type="checkbox" id="chk-roads" checked onchange="toggleRoadsLayer(this.checked)">
-                        <span>🛣️ Rodovias</span>
+                        <span>Rodovias</span>
                     </label>
                 </div>
             </div>
@@ -1086,11 +1070,11 @@ def generate_interactive_dashboard(
         <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 16px; padding: 14px; margin-bottom: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <div style="font-size: 12px; font-weight: 800; color: #fbbf24; display: flex; align-items: center; gap: 6px;">
-                    <span>🔥</span>
+                    <span></span>
                     <span>Top 10 Pontos de Pico (por 10k hab)</span>
                 </div>
                 <span id="peaks-badge-topic" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.4);">
-                    🚨 Todos os Incidentes
+                    Todos os Incidentes
                 </span>
             </div>
             <div style="font-size: 10px; color: #94a3b8; margin-bottom: 8px;">
@@ -1100,7 +1084,7 @@ def generate_interactive_dashboard(
             <!-- Card de Concentração Geográfica dos Picos -->
             <div id="peaks-concentration-box" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; padding: 8px 10px; margin-bottom: 10px;">
                 <div style="font-size: 10px; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 4px; margin-bottom: 3px;">
-                    <span>📍</span>
+                    <span></span>
                     <span>Concentração Geográfica dos 10 Picos:</span>
                 </div>
                 <div id="peaks-concentration-text" style="font-size: 10px; color: #f1f5f9; line-height: 1.4;">
@@ -1141,7 +1125,7 @@ def generate_interactive_dashboard(
 
         <!-- Seção: Tabela Dinâmica de Ranking -->
         <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 14px; margin-bottom: 16px;">
-            <div id="ranking-table-title" style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">🏆 Ranking Territorial</div>
+            <div id="ranking-table-title" style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Ranking Territorial</div>
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                     <thead id="ranking-table-head">
@@ -1154,7 +1138,7 @@ def generate_interactive_dashboard(
 
         <!-- Seção: Gráfico de Evolução Anual -->
         <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 14px; margin-bottom: 16px;">
-            <div style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">📈 Evolução Anual de Denúncias em SC</div>
+            <div style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Evolução anual de registros de violação em SC</div>
             <div style="height: 140px; width: 100%;">
                 <canvas id="scYearChart"></canvas>
             </div>
@@ -1162,7 +1146,7 @@ def generate_interactive_dashboard(
 
         <!-- Seção: 30 Unidades da Polícia Científica -->
         <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 14px;">
-            <div style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">🔬 30 Unidades da Polícia Científica de SC (PCI-SC)</div>
+            <div style="font-size: 12px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">30 Unidades da Polícia Científica de SC (PCI-SC)</div>
             <div id="pci-units-list" style="max-height: 200px; overflow-y: auto; padding-right: 4px;">
             </div>
         </div>
@@ -1358,20 +1342,11 @@ def generate_interactive_dashboard(
             const topicLabels = {{
                 'total': 'Visão Consolidada (Todos os Casos)',
                 'crianca': 'Crianças e Adolescentes (ECA)',
-                'mulher': 'Mulheres (Violência de Gênero)',
-                'idoso': 'Pessoas Idosas (Estatuto do Idoso)',
+                'mulher': 'Mulheres em Violência de Gênero',
+                'idoso': 'Pessoas Idosas (Estatuto da Pessoa Idosa)',
                 'pcd': 'Pessoas com Deficiência (PCD)',
                 'lgbt': 'População LGBTQIA+',
                 'preso': 'Sistema Prisional e População de Rua'
-            }};
-            const topicIcons = {{
-                'total': '🚨',
-                'crianca': '👶',
-                'mulher': '👩',
-                'idoso': '👴',
-                'pcd': '♿',
-                'lgbt': '🏳️‍🌈',
-                'preso': '⛓️'
             }};
             const metricNames = {{
                 'penal': 'Indício Penal',
@@ -1380,7 +1355,6 @@ def generate_interactive_dashboard(
             }};
 
             const topicLabel = topicLabels[topicKey] || (D.topics_map && D.topics_map[topicKey]) || 'Total Geral';
-            const topicIcon = topicIcons[topicKey] || (D.topic_icons && D.topic_icons[topicKey]) || '🚨';
             const metricLabel = metricNames[metricType] || 'Indício Penal';
             const scaleLabel = (scaleFactor === 100000) ? '100k hab' : ((scaleFactor === 50000) ? '50k hab' : '10k hab');
 
@@ -1441,7 +1415,7 @@ def generate_interactive_dashboard(
                         fillOpacity: 0.12,
                         weight: 1.5,
                         dashArray: '5, 5'
-                    }}).bindTooltip(`📍 <b>Concentração Espacial de Picos (${{rname}})</b><br>${{cnt}} municípios no Top 10:<br>• ${{rPeaks.map(p => p.nome).join('<br>• ')}}`, {{ sticky: true, offset: L.point(15, -15), className: 'custom-sc-tooltip' }});
+                    }}).bindTooltip(`<b>Concentração Espacial de Picos (${{rname}})</b><br>${{cnt}} municípios no Top 10:<br>• ${{rPeaks.map(p => p.nome).join('<br>• ')}}`, {{ sticky: true, offset: L.point(15, -15), className: 'custom-sc-tooltip' }});
                     peaksConcentrationLayerGroup.addLayer(circle);
                 }}
             }});
@@ -1451,7 +1425,7 @@ def generate_interactive_dashboard(
             const concText = document.getElementById('peaks-concentration-text');
             const listContainer = document.getElementById('peaks-items-list');
 
-            if (badgeTopic) badgeTopic.innerHTML = `${{topicIcon}} ${{topicLabel}}`;
+            if (badgeTopic) badgeTopic.innerHTML = `${{topicLabel}}`;
             if (concText) {{
                 concText.innerHTML = (sortedRegs.length > 0 && sortedRegs[0][1] >= 2)
                     ? `Foco em <strong>${{sortedRegs[0][0]}}</strong> (${{sortedRegs[0][1]}} municípios entre os 10 maiores picos estaduais).`
@@ -1473,7 +1447,7 @@ def generate_interactive_dashboard(
                         <div class="peak-marker-wrapper">
                             ${{isTop3 ? `<div class="peak-pulse-glow" style="background: ${{pulseColor}}; pointer-events: none !important;"></div>` : ''}}
                             <div class="peak-badge-icon" style="background: ${{badgeBg}};">
-                                <span>${{topicIcon}}</span>
+                                
                             </div>
                             <div class="peak-rank-tag" style="background: ${{rankTagBg}}; color: #ffffff;">
                                 #${{rank}}
@@ -1494,12 +1468,12 @@ def generate_interactive_dashboard(
                 // Tooltip posicionado acima do marcador (não sobrepõe o ícone)
                 const tooltipHtml = `
                     <div style="font-size: 12px; line-height: 1.4; padding: 2px;">
-                        <div style="font-weight: 800; color: #f59e0b; font-size: 13px;">🔥 #${{rank}} PICO ESTADUAL: ${{item.nome}}</div>
+                        <div style="font-weight: 800; color: #f59e0b; font-size: 13px;">#${{rank}} PICO ESTADUAL: ${{item.nome}}</div>
                         <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Região de ${{item.regiao}}</div>
-                        <div style="color: #fbbf24; font-weight: 800; font-size: 13px;">📊 ${{decFmt.format(item.rate)}} a cada ${{scaleLabel}}</div>
-                        <div>👥 <strong>População (Censo 2022):</strong> ${{numFmt.format(item.pop)}} hab.</div>
-                        <div>📈 <strong>Ocorrências (${{metricLabel}}):</strong> ${{numFmt.format(item.count)}} denúncias</div>
-                        <div style="color: #38bdf8; margin-top: 3px; font-size: 11px;">🔬 <strong>PCI Mais Próxima:</strong> ${{item.pci_proxima}}</div>
+                        <div style="color: #fbbf24; font-weight: 800; font-size: 13px;">${{decFmt.format(item.rate)}} a cada ${{scaleLabel}}</div>
+                        <div><strong>População (Censo 2022):</strong> ${{numFmt.format(item.pop)}} hab.</div>
+                        <div><strong>Ocorrências (${{metricLabel}}):</strong> ${{numFmt.format(item.count)}} registros</div>
+                        <div style="color: #38bdf8; margin-top: 3px; font-size: 11px;"><strong>PCI Mais Próxima:</strong> ${{item.pci_proxima}}</div>
                     </div>
                 `;
                 marker.bindTooltip(tooltipHtml, {{
@@ -1515,8 +1489,8 @@ def generate_interactive_dashboard(
                     <div style="font-family: 'Segoe UI', system-ui, sans-serif; width: 320px; color: #1e293b; line-height: 1.4;">
                         <div style="background: ${{badgeBg}}; color: white; padding: 12px 14px; border-radius: 10px 10px 0 0;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 800;">🔥 PICO #${{rank}} EM SC</span>
-                                <span style="font-size: 11px; font-weight: 700;">${{topicIcon}} ${{topicLabel}}</span>
+                                <span style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 800;">PICO #${{rank}} EM SC</span>
+                                <span style="font-size: 11px; font-weight: 700;">${{topicLabel}}</span>
                             </div>
                             <div style="font-size: 17px; font-weight: 800; margin-top: 4px;">${{item.nome}}</div>
                             <div style="font-size: 11px; opacity: 0.9;">Região Intermediária de ${{item.regiao}}</div>
@@ -1541,7 +1515,7 @@ def generate_interactive_dashboard(
 
                             <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 6px 0;">
                             <div style="font-size: 10px; color: #334155;">
-                                <strong>🔬 PCI Mais Próxima:</strong> ${{item.pci_proxima}}
+                                <strong>PCI Mais Próxima:</strong> ${{item.pci_proxima}}
                             </div>
                         </div>
                     </div>
@@ -1594,8 +1568,8 @@ def generate_interactive_dashboard(
             const topicLabels = {{
                 'total': 'Visão Consolidada (Todos os Casos)',
                 'crianca': 'Crianças e Adolescentes (ECA)',
-                'mulher': 'Mulheres (Violência de Gênero)',
-                'idoso': 'Pessoas Idosas (Estatuto do Idoso)',
+                'mulher': 'Mulheres em Violência de Gênero',
+                'idoso': 'Pessoas Idosas (Estatuto da Pessoa Idosa)',
                 'pcd': 'Pessoas com Deficiência (PCD)',
                 'lgbt': 'População LGBTQIA+',
                 'preso': 'Sistema Prisional e População de Rua'
@@ -1690,10 +1664,10 @@ def generate_interactive_dashboard(
                         <div style="font-size: 12px; line-height: 1.4; padding: 2px;">
                             <div style="font-weight: 800; color: #38bdf8; font-size: 13px;">${{m.nome || 'Município'}}</div>
                             <div style="color: #94a3b8; font-size: 11px; margin-bottom: 4px;">Região de ${{m.regiao_intermediaria || 'SC'}}</div>
-                            <div>👥 <strong>População (Censo 2022):</strong> ${{numFmt.format(pop)}} hab.</div>
-                            <div>📊 <strong>${{topicLabel}} (${{metricLabel}}):</strong> ${{numFmt.format(count)}} ocorrências</div>
-                            <div style="color: #fbbf24; font-weight: 800; margin-top: 3px; font-size: 12px;">🔥 <strong>Taxa Proporcional:</strong> ${{decFmt.format(rate)}} a cada ${{scaleLabel}}</div>
-                            <div style="color: #38bdf8; font-size: 11px; margin-top: 4px;">🔬 <strong>PCI Mais Próxima:</strong> ${{m.pci_proxima || 'PCI SC Regional'}}</div>
+                            <div><strong>População (Censo 2022):</strong> ${{numFmt.format(pop)}} hab.</div>
+                            <div><strong>${{topicLabel}} (${{metricLabel}}):</strong> ${{numFmt.format(count)}} ocorrências</div>
+                            <div style="color: #fbbf24; font-weight: 800; margin-top: 3px; font-size: 12px;"><strong>Taxa Proporcional:</strong> ${{decFmt.format(rate)}} a cada ${{scaleLabel}}</div>
+                            <div style="color: #38bdf8; font-size: 11px; margin-top: 4px;"><strong>PCI Mais Próxima:</strong> ${{m.pci_proxima || 'PCI SC Regional'}}</div>
                         </div>
                     `;
 
@@ -1886,27 +1860,27 @@ def generate_interactive_dashboard(
                             </div>
                             <div style="padding: 12px 14px; background: #ffffff; border-radius: 0 0 10px 10px; border: 1px solid #e2e8f0; border-top: none;">
                                 <div style="margin-bottom: 8px; font-size: 11px; color: #475569;">
-                                    <strong>👤 Responsável:</strong> ${{u.responsavel}}<br>
-                                    <strong>📧 E-mail:</strong> <a href="mailto:${{u.email}}" style="color: #0284c7;">${{u.email}}</a><br>
-                                    <strong>🛣️ Acesso Principal:</strong> <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${{u.rodovia_principal}}</span>
+                                    <strong>Responsável:</strong> ${{u.responsavel}}<br>
+                                    <strong>E-mail:</strong> <a href="mailto:${{u.email}}" style="color: #0284c7;">${{u.email}}</a><br>
+                                    <strong>Acesso Principal:</strong> <span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${{u.rodovia_principal}}</span>
                                 </div>
                                 <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 6px 0;">
                                 <div style="font-size: 11px;">
                                     <div style="margin-bottom: 6px;">
-                                        <span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">⚖️ MEDICINA LEGAL (IML)</span>
-                                        <div style="color: #334155; margin-top: 2px;">📍 ${{iml.endereco || 'Atendimento Regional'}} | 📞 ${{iml.telefone || '(48) 3665-8000'}} | 🕒 ${{iml.horario || 'Plantão 24h'}}</div>
+                                        <span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">MEDICINA LEGAL (IML)</span>
+                                        <div style="color: #334155; margin-top: 2px;">${{iml.endereco || 'Atendimento Regional'}} | ${{iml.telefone || '(48) 3665-8000'}} | ${{iml.horario || 'Plantão 24h'}}</div>
                                     </div>
                                     <div style="margin-bottom: 6px;">
-                                        <span style="background: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">🔬 CRIMINALÍSTICA & PERÍCIAS</span>
-                                        <div style="color: #334155; margin-top: 2px;">📍 ${{crim.endereco || 'Atendimento Regional'}} | 📞 ${{crim.telefone || '(48) 3665-8000'}} | 🕒 ${{crim.horario || 'Plantão 24h'}}</div>
+                                        <span style="background: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">CRIMINALÍSTICA & PERÍCIAS</span>
+                                        <div style="color: #334155; margin-top: 2px;">${{crim.endereco || 'Atendimento Regional'}} | ${{crim.telefone || '(48) 3665-8000'}} | ${{crim.horario || 'Plantão 24h'}}</div>
                                     </div>
                                     <div>
-                                        <span style="background: #ecfdf5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">🪪 IDENTIFICAÇÃO CIVIL (CIN)</span>
-                                        <div style="color: #334155; margin-top: 2px;">📍 ${{ident.endereco || 'Atendimento Regional'}} | 📞 ${{ident.telefone || '(48) 3665-8000'}} | 🕒 ${{ident.horario || 'Segunda a Sexta'}}</div>
+                                        <span style="background: #ecfdf5; color: #065f46; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">IDENTIFICAÇÃO CIVIL (CIN)</span>
+                                        <div style="color: #334155; margin-top: 2px;">${{ident.endereco || 'Atendimento Regional'}} | ${{ident.telefone || '(48) 3665-8000'}} | ${{ident.horario || 'Segunda a Sexta'}}</div>
                                     </div>
                                 </div>
                                 <div style="margin-top: 10px; text-align: center;">
-                                    <a href="${{u.url_oficial}}" target="_blank" style="display: inline-block; background: #0284c7; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">🌐 Página Oficial</a>
+                                    <a href="${{u.url_oficial}}" target="_blank" style="display: inline-block; background: #0284c7; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">Página Oficial</a>
                                 </div>
                             </div>
                         </div>
@@ -1919,7 +1893,7 @@ def generate_interactive_dashboard(
                         color: '#ffffff',
                         weight: 2,
                         fillOpacity: 0.95
-                    }}).bindPopup(popHtml, {{ maxWidth: 380 }}).bindTooltip(`🔬 <b>${{u.nome_unidade}}</b><br>🛣️ Acesso: ${{u.rodovia_principal}}`, {{ sticky: true, className: 'custom-sc-tooltip' }});
+                    }}).bindPopup(popHtml, {{ maxWidth: 380 }}).bindTooltip(`<b>${{u.nome_unidade}}</b><br>Acesso: ${{u.rodovia_principal}}`, {{ sticky: true, className: 'custom-sc-tooltip' }});
 
                     pciLayerGroup.addLayer(marker);
 
@@ -1927,7 +1901,7 @@ def generate_interactive_dashboard(
                         pciListEl.innerHTML += `
                             <div style="padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 11px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-weight: 700; color: #38bdf8;">📍 ${{u.municipio}}</span>
+                                    <span style="font-weight: 700; color: #38bdf8;">${{u.municipio}}</span>
                                     <span style="font-size: 9px; color: #94a3b8; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px;">${{u.rodovia_principal}}</span>
                                 </div>
                                 <div style="font-size: 10px; color: #cbd5e1; margin-top: 2px;">${{u.nome_unidade}}</div>
@@ -1955,7 +1929,7 @@ def generate_interactive_dashboard(
                     data: {{
                         labels: yearsSorted,
                         datasets: [{{
-                            label: 'Denúncias',
+                            label: 'Registros de violação',
                             data: yearsVals,
                             borderColor: '#38bdf8',
                             backgroundColor: 'rgba(56, 189, 248, 0.15)',
@@ -2002,7 +1976,7 @@ def generate_interactive_dashboard(
 
     m.get_root().html.add_child(folium.Element(embedded_html))
     m.save(str(output_path))
-    print(f"✅ Dashboard geral salvo com sucesso em: '{output_path}'")
+    print(f"Dashboard geral salvo com sucesso em: '{output_path}'")
 
 
 def main():
@@ -2014,7 +1988,7 @@ def main():
     uf_alvo = "SC"
 
     print("======================================================================")
-    print("🚀 GERADOR DO DASHBOARD DINÂMICO SC: DISQUE 100 + CENSO 2022 + PICOS / 10K HAB")
+    print("GERADOR DO DASHBOARD DINÂMICO SC: DISQUE 100 + CENSO 2022 + PICOS / 10K HAB")
     print("======================================================================")
 
     # 1. População Oficial dos 295 Municípios (Censo 2022)
@@ -2057,13 +2031,13 @@ def main():
     generate_interactive_dashboard(sc_data, pci_units, geojson_sc, geojson_inter, peaks_info, output_html_dash)
 
     print("\n======================================================================")
-    print(f"🎉 Dashboard Concluído com Sucesso!")
-    print(f" • Total de Denúncias em SC: {sc_data['total_sc']:,}")
+    print(f"Dashboard Concluído com Sucesso!")
+    print(f" . Registros de violacao em SC: {sc_data['total_sc']:,}")
     print(f" • População SC (Censo 2022): {sum(pop_map.values()):,}")
     print(f" • Categorias Analisadas: {len(TOPICS_MAP)} tipos de incidentes")
     print(f" • Pontos de Pico: 10 picos por categoria (proporção / 10k hab)")
     print(f" • Unidades da Polícia Científica: {len(pci_units)} unidades")
-    print(f"📄 Salvo em: file://{output_html_dash}")
+    print(f"Salvo em: file://{output_html_dash}")
     print("======================================================================")
 
 

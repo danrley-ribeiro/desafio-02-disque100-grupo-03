@@ -194,10 +194,10 @@ def cleanup_converted_csvs(dest_dir: Path) -> int:
                 deleted_count += 1
                 freed_bytes += size
             except Exception as e:
-                console.print(f"[yellow]⚠️ Não foi possível apagar {csv_file.name}: {e}[/yellow]")
+                console.print(f"[yellow]Não foi possível apagar {csv_file.name}: {e}[/yellow]")
     
     if deleted_count > 0:
-        console.print(f"[green]🗑️  Limpeza concluída:[/green] {deleted_count} CSV(s) já convertidos foram apagados ([bold]{freed_bytes / (1024*1024):.2f} MB liberados[/bold]).")
+        console.print(f"[green] Limpeza concluída:[/green] {deleted_count} CSV(s) já convertidos foram apagados ([bold]{freed_bytes / (1024*1024):.2f} MB liberados[/bold]).")
     return deleted_count
 
 def download_file_resilient(
@@ -300,7 +300,7 @@ def process_single_dataset(
         if delete_csv_after and csv_file.exists():
             csv_file.unlink(missing_ok=True)
             
-        progress.update(task_id, description="[bold green]Concluído e Validado ✅")
+        progress.update(task_id, description="[bold green]Concluído e Validado ")
         return (base_name, "SUCESSO")
     except Exception as e:
         progress.update(task_id, description=f"[red]Erro: {str(e)[:20]}")
@@ -339,7 +339,7 @@ def main():
         else:
             pending_items.append(item)
 
-    table = Table(title="\n📊 Status dos Conjuntos de Dados Históricos", border_style="blue")
+    table = Table(title="\nStatus dos Conjuntos de Dados Históricos", border_style="blue")
     table.add_column("Dataset", style="bold")
     table.add_column("Tipo", style="cyan")
     table.add_column("Status Atual", style="green")
@@ -352,10 +352,10 @@ def main():
     console.print(table)
 
     if not pending_items:
-        console.print("\n[bold green]🎉 Todos os datasets do Disque 100 já foram baixados e convertidos para Parquet![/bold green]")
+        console.print("\n[bold green]Todos os datasets do Disque 100 já foram baixados e convertidos para Parquet![/bold green]")
         return
 
-    console.print(f"\n[bold yellow]🚀 Processando {len(pending_items)} conjuntos faltantes em paralelo ({args.workers} workers)...[/bold yellow]\n")
+    console.print(f"\n[bold yellow]Processando {len(pending_items)} conjuntos faltantes em paralelo ({args.workers} workers)...[/bold yellow]\n")
 
     # 3. Executa downloads e conversões em paralelo com Barras de Progresso TUI e tratamento gracioso de Ctrl+C
     executor = ThreadPoolExecutor(max_workers=args.workers)
@@ -395,7 +395,7 @@ def main():
                     progress.update(task_map[item['name']], description=f"[red]Erro: {e}")
 
     except KeyboardInterrupt:
-        console.print("\n[bold yellow]⚠️ Interrompido pelo usuário (Ctrl+C). Cancelando tarefas com segurança...[/bold yellow]")
+        console.print("\n[bold yellow]Interrompido pelo usuário (Ctrl+C). Cancelando tarefas com segurança...[/bold yellow]")
         executor.shutdown(wait=False, cancel_futures=True)
         # Limpa arquivos temporários .part incompletos
         for part_file in dest_dir.glob("*.part"):
@@ -409,7 +409,7 @@ def main():
 
     # Limpeza final preventiva
     cleanup_converted_csvs(dest_dir)
-    console.print("\n[bold green]✅ Processo finalizado![/bold green]")
+    console.print("\n[bold green]Processo finalizado![/bold green]")
 
 if __name__ == "__main__":
     main()

@@ -1,189 +1,261 @@
 """
-Aba 4: Microdados e Tabela Analítica dos 295 Municípios de SC com Filtros Avançados.
+=============================================================================
+Aba Dados: tabela municipal, filtros cruzados e exportacao
+=============================================================================
+Correcoes de comportamento em relacao a versao anterior:
+
+  - a ordenacao alfabetica estava invertida: escolher "decrescente" ordenava
+    de A a Z;
+  - o filtro "acima da media" comparava a taxa exibida, que pode ser penal ou
+    socioassistencial, contra uma media sempre calculada no total;
+  - os titulos afirmavam "295 municipios" mesmo quando o recorte por ano ou
+    por regiao trazia menos;
+  - `st.dataframe` recebia `use_container_width` e `width` ao mesmo tempo.
+=============================================================================
 """
+
+from __future__ import annotations
+
+import io
+from typing import Dict, List
 
 import pandas as pd
 import streamlit as st
-from streamlit_app.config import PORTE_OPCOES, PERFIL_SEVERIDADE_OPCOES, ZONA_PCI_OPCOES
-from streamlit_app.utils.formatters import format_brazilian
+
+from streamlit_app.config import (
+    FAIXA_DISTANTE,
+    FAIXA_INTERMEDIARIA,
+    FAIXA_PROXIMA,
+    Filtros,
+    PERFIL_OPCOES,
+    PORTE_OPCOES,
+    UNIDADE_ROTULO,
+    ZONA_PCI_OPCOES,
+)
+from streamlit_app.utils.formatters import (
+    SEM_DADO,
+    formatar_km,
+    formatar_numero,
+    formatar_percentual,
+    formatar_taxa,
+)
+
+DICIONARIO_COLUNAS: Dict[str, str] = {
+    "Município": "Nome oficial do município, IBGE.",
+    "Região intermediária": "Divisão regional do IBGE de 2017; Santa Catarina tem sete.",
+    "População": "População residente no Censo Demográfico 2022, tabela SIDRA 4714.",
+    "Total": "Contagem na unidade de medida ativa, no período e grupo selecionados.",
+    "Indício penal": "Subconjunto do total que a taxonomia tipifica como infração penal.",
+    "Demanda social": "Total menos indício penal.",
+    "% penal": "Indício penal dividido pelo total do município.",
+    "Taxa total": "Total anualizado por habitante, na escala escolhida.",
+    "Taxa penal": "Indício penal anualizado por habitante, na escala escolhida.",
+    "Distância da PCI": "Distância geodésica em linha reta até a unidade pericial mais próxima.",
+    "Unidade pericial": "Unidade da Polícia Científica mais próxima em linha reta.",
+}
 
 
-def render_tab_dados(
-    df_filtrado: pd.DataFrame,
-    col_total: str,
-    col_penal: str,
-    label_escala: str,
-    label_metrica_ativa: str,
-    fator_pop: int,
-    taxa_media_pop: float,
-    grupo_key: str,
-    year_param: str
-) -> None:
-    """Renderiza a tabela analítica municipal com filtros cruzados, ordenação e exportação de dados."""
-    st.subheader("Base de Dados dos 295 Municípios de Santa Catarina")
-    st.markdown("Explore, filtre e pesquise os indicadores detalhados dos municípios de Santa Catarina com múltiplos critérios simultâneos.")
+def render_tab_dados(df: pd.DataFrame, filtros: Filtros) -> None:
+    if df.empty:
+        st.info("Nenhum município no recorte selecionado.")
+        return
 
-    # Painel de Filtros Avançados em Grid
-    col_s1, col_s2, col_s3, col_s4 = st.columns([4, 3, 3, 3])
-    with col_s1:
-        busca = st.text_input("🔍 Pesquisar município, região ou código IBGE:", placeholder="Ex.: Chapecó, 4205407, Joinville...")
-    with col_s2:
-        filtro_porte = st.selectbox("Porte Populacional (IBGE):", PORTE_OPCOES)
-    with col_s3:
-        filtro_severidade = st.selectbox("Perfil de Ocorrência:", PERFIL_SEVERIDADE_OPCOES)
-    with col_s4:
-        filtro_pci = st.selectbox("Acesso Forense (PCI):", ZONA_PCI_OPCOES)
+    unidade = UNIDADE_ROTULO[filtros.unidade_efetiva()]
+    st.subheader(f"Tabela municipal — {len(df)} municípios no recorte")
+    st.caption(
+        f"Período {filtros.label_periodo}, {filtros.rotulo_territorio}, "
+        f"grupo {filtros.rotulo_grupo.lower()}, contagem em {unidade}."
+    )
 
-    df_view = df_filtrado.copy()
+    # -------------------------------------------------------------------------
+    # Filtros da aba
+    # -------------------------------------------------------------------------
+    c1, c2, c3, c4 = st.columns([4, 3, 3, 3])
+    busca = c1.text_input(
+        "Pesquisar",
+        placeholder="município, região ou código IBGE",
+        key="d_busca",
+    )
+    porte = c2.selectbox("Porte populacional", PORTE_OPCOES, key="d_porte")
+    perfil = c3.selectbox("Perfil da ocorrência", PERFIL_OPCOES, key="d_perfil")
+    faixa = c4.selectbox("Distância da perícia", ZONA_PCI_OPCOES, key="d_faixa")
 
-    # Filtro de porte populacional
-    if filtro_porte == "Pequeno Porte I (< 20 mil hab)":
-        df_view = df_view[df_view["populacao_censo_2022"] < 20000]
-    elif filtro_porte == "Pequeno Porte II (20 mil a 50 mil hab)":
-        df_view = df_view[(df_view["populacao_censo_2022"] >= 20000) & (df_view["populacao_censo_2022"] <= 50000)]
-    elif filtro_porte == "Médio Porte (50 mil a 100 mil hab)":
-        df_view = df_view[(df_view["populacao_censo_2022"] > 50000) & (df_view["populacao_censo_2022"] <= 100000)]
-    elif filtro_porte == "Grande Porte (> 100 mil hab)":
-        df_view = df_view[df_view["populacao_censo_2022"] > 100000]
+    view = _aplicar_filtros(df, busca, porte, perfil, faixa)
 
-    # Filtro de severidade criminal
-    if filtro_severidade == "Predomínio Penal (> 60% Crimes)":
-        df_view = df_view[df_view["pct_penal_mun"] >= 60.0]
-    elif filtro_severidade == "Predomínio Social (> 60% Rede SUAS)":
-        df_view = df_view[df_view["pct_penal_mun"] < 40.0]
-    elif filtro_severidade == "Picos Acima da Média Estadual":
-        df_view = df_view[df_view["taxa_exibicao"] >= taxa_media_pop]
+    # -------------------------------------------------------------------------
+    # Resumo do subconjunto
+    # -------------------------------------------------------------------------
+    pop = int(view["populacao_censo_2022"].sum()) if not view.empty else 0
+    total = int(view["valor_total"].sum()) if not view.empty else 0
+    anos = max(filtros.semestres_no_recorte, 1) / 2.0
+    taxa = (total / pop / anos * filtros.fator_pop) if pop else None
 
-    # Filtro de distância pericial PCI
-    if filtro_pci == "Vazios Críticos (> 50 km)":
-        df_view = df_view[df_view["distancia_pci_km"] > 50.0]
-    elif filtro_pci == "Atenção Moderada (25 a 50 km)":
-        df_view = df_view[(df_view["distancia_pci_km"] >= 25.0) & (df_view["distancia_pci_km"] <= 50.0)]
-    elif filtro_pci == "Resposta Imediata (< 25 km)":
-        df_view = df_view[df_view["distancia_pci_km"] < 25.0]
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Municípios", f"{len(view)} de {len(df)}")
+    m2.metric("População coberta", f"{formatar_numero(pop)} hab.")
+    m3.metric(unidade.capitalize(), formatar_numero(total))
+    m4.metric(f"Taxa anual {filtros.rotulo_escala}", formatar_taxa(taxa))
 
-    # Busca textual multidimensional
-    if busca:
-        b_norm = busca.strip().lower()
-        df_view = df_view[
-            df_view["municipio"].str.lower().str.contains(b_norm, na=False) |
-            df_view["regiao_intermediaria"].str.lower().str.contains(b_norm, na=False) |
-            df_view["regiao_imediata"].str.lower().str.contains(b_norm, na=False) |
-            df_view["ibge_code"].astype(str).str.contains(b_norm, na=False)
-        ]
+    if view.empty:
+        st.info("Nenhum município atende aos filtros escolhidos.")
+        return
 
-    # Painel Resumo em 4 Métricas Dinâmicas
-    tot_muns_view = len(df_view)
-    pop_view = int(df_view["populacao_censo_2022"].sum())
-    casos_view = int(df_view[col_total].sum())
-    taxa_view = (casos_view / max(pop_view, 1)) * fator_pop
-
-    rm1, rm2, rm3, rm4 = st.columns(4)
-    with rm1:
-        st.metric("Municípios Filtrados", f"{tot_muns_view} de {len(df_filtrado)}")
-    with rm2:
-        st.metric("População Coberta", format_brazilian(pop_view) + " hab")
-    with rm3:
-        st.metric("Volume de Denúncias", format_brazilian(casos_view))
-    with rm4:
-        st.metric("Taxa Média do Recorte", f"{taxa_view:.1f} / {fator_pop//1000}k hab")
-
-    # Controles de Ordenação Flexível
-    col_ord1, col_ord2 = st.columns([7, 3])
-    with col_ord1:
-        opcao_ordem = st.selectbox(
-            "Ordenar Resultados por:",
-            [
-                f"Taxa Proporcional Ativa ({label_metrica_ativa})",
-                "Total Geral de Ocorrências",
-                "Indício Penal (Casos Criminais)",
-                "Demanda Socioassistencial",
-                "População Residente (Censo 2022)",
-                "Distância até a Unidade PCI (km)",
-                "Nome do Município (Alfabético)"
-            ]
-        )
-    with col_ord2:
-        direcao_ordem = st.radio("Direção da Ordenação:", ["Decrescente (Maior primeiro)", "Crescente (Menor primeiro)"], horizontal=True)
-
-    col_sort_map = {
-        f"Taxa Proporcional Ativa ({label_metrica_ativa})": "taxa_exibicao",
-        "Total Geral de Ocorrências": col_total,
-        "Indício Penal (Casos Criminais)": col_penal,
-        "Demanda Socioassistencial": "demanda_social",
-        "População Residente (Censo 2022)": "populacao_censo_2022",
-        "Distância até a Unidade PCI (km)": "distancia_pci_km",
-        "Nome do Município (Alfabético)": "municipio"
+    # -------------------------------------------------------------------------
+    # Ordenacao
+    # -------------------------------------------------------------------------
+    opcoes_ordem = {
+        f"Taxa anual {filtros.rotulo_escala}": "taxa_exibicao",
+        f"Total ({unidade})": "valor_total",
+        "Indício penal": "valor_penal",
+        "Demanda socioassistencial": "valor_social",
+        "Percentual penal": "pct_penal",
+        "População (Censo 2022)": "populacao_censo_2022",
+        "Distância da perícia": "distancia_pci_km",
+        "Nome do município": "municipio",
     }
-    coluna_sort = col_sort_map[opcao_ordem]
-    is_asc = (direcao_ordem == "Crescente (Menor primeiro)") if coluna_sort != "municipio" else (direcao_ordem == "Decrescente (Maior primeiro)")
+    col_o1, col_o2 = st.columns([7, 3])
+    escolha = col_o1.selectbox("Ordenar por", list(opcoes_ordem.keys()), key="d_ordem")
+    coluna_ordem = opcoes_ordem[escolha]
 
-    df_view_sorted = df_view.sort_values(by=coluna_sort, ascending=is_asc).reset_index(drop=True)
-    df_view_sorted["ranking"] = [f"#{i+1}" for i in range(len(df_view_sorted))]
+    if coluna_ordem == "municipio":
+        direcao = col_o2.radio("Direção", ["A a Z", "Z a A"], horizontal=True, key="d_dir_txt")
+        crescente = direcao == "A a Z"
+    else:
+        direcao = col_o2.radio(
+            "Direção", ["Maior primeiro", "Menor primeiro"], horizontal=True, key="d_dir_num"
+        )
+        crescente = direcao == "Menor primeiro"
 
-    colunas_exibicao = [
-        "ranking",
-        "municipio",
-        "regiao_intermediaria",
-        "populacao_censo_2022",
-        col_total,
-        col_penal,
-        "demanda_social",
-        "pct_penal_mun",
-        "taxa_total_exibicao",
-        "taxa_penal_exibicao",
-        "distancia_pci_km",
-        "pci_proxima"
+    ordenado = view.sort_values(coluna_ordem, ascending=crescente, na_position="last").reset_index(drop=True)
+    ordenado.insert(0, "posicao", range(1, len(ordenado) + 1))
+
+    # -------------------------------------------------------------------------
+    # Tabela
+    # -------------------------------------------------------------------------
+    tabela = pd.DataFrame({
+        "#": ordenado["posicao"],
+        "Município": ordenado["municipio"],
+        "Região intermediária": ordenado["regiao_intermediaria"],
+        "População": ordenado["populacao_censo_2022"].map(formatar_numero),
+        "Total": ordenado["valor_total"].map(formatar_numero),
+        "Indício penal": ordenado["valor_penal"].map(formatar_numero),
+        "Demanda social": ordenado["valor_social"].map(formatar_numero),
+        "% penal": ordenado["pct_penal"].map(formatar_percentual),
+        "Taxa total": ordenado["taxa_total"].map(formatar_taxa),
+        "Taxa penal": ordenado["taxa_penal"].map(formatar_taxa),
+        "Distância da PCI": ordenado["distancia_pci_km"].map(formatar_km),
+        "Unidade pericial": ordenado["pci_proxima_municipio"].fillna(SEM_DADO)
+        if "pci_proxima_municipio" in ordenado.columns else SEM_DADO,
+    })
+    st.dataframe(tabela, hide_index=True, width="stretch", height=430)
+
+    if coluna_ordem in ("taxa_exibicao", "pct_penal") and not crescente:
+        st.caption(
+            "Ordenar por taxa coloca no topo municípios muito pequenos, cuja taxa oscila em "
+            "ordens de magnitude a cada denúncia. A tabela mostra todos os municípios de "
+            "propósito; o piso populacional da barra lateral vale para os rankings e o mapa, "
+            "onde a leitura é comparativa."
+        )
+
+    with st.expander("Dicionário de colunas"):
+        st.dataframe(
+            pd.DataFrame(
+                {"Coluna": list(DICIONARIO_COLUNAS.keys()), "Significado": list(DICIONARIO_COLUNAS.values())}
+            ),
+            hide_index=True,
+            width="stretch",
+        )
+
+    # -------------------------------------------------------------------------
+    # Exportacao
+    # -------------------------------------------------------------------------
+    base_nome = f"sc_disque100_{filtros.grupo}_{filtros.year_param}_{filtros.unidade_efetiva()}"
+    exportavel = _preparar_exportacao(ordenado)
+
+    d1, d2, d3 = st.columns(3)
+    d1.download_button(
+        "Baixar CSV",
+        data=exportavel.to_csv(index=False).encode("utf-8-sig"),
+        file_name=f"{base_nome}.csv",
+        mime="text/csv",
+        width="stretch",
+    )
+    d2.download_button(
+        "Baixar JSON",
+        data=exportavel.to_json(orient="records", force_ascii=False, indent=2).encode("utf-8"),
+        file_name=f"{base_nome}.json",
+        mime="application/json",
+        width="stretch",
+    )
+    buffer = io.BytesIO()
+    exportavel.to_parquet(buffer, index=False)
+    d3.download_button(
+        "Baixar Parquet",
+        data=buffer.getvalue(),
+        file_name=f"{base_nome}.parquet",
+        mime="application/octet-stream",
+        width="stretch",
+    )
+    st.caption(
+        "A exportação traz os valores numéricos sem formatação, na unidade de medida e no "
+        "recorte ativos, com a coluna de unidade registrada para rastreabilidade."
+    )
+
+
+def _aplicar_filtros(
+    df: pd.DataFrame, busca: str, porte: str, perfil: str, faixa: str
+) -> pd.DataFrame:
+    view = df
+
+    if porte == PORTE_OPCOES[1]:
+        view = view[view["populacao_censo_2022"] < 20_000]
+    elif porte == PORTE_OPCOES[2]:
+        view = view[(view["populacao_censo_2022"] >= 20_000) & (view["populacao_censo_2022"] < 50_000)]
+    elif porte == PORTE_OPCOES[3]:
+        view = view[(view["populacao_censo_2022"] >= 50_000) & (view["populacao_censo_2022"] < 100_000)]
+    elif porte == PORTE_OPCOES[4]:
+        view = view[view["populacao_censo_2022"] >= 100_000]
+
+    if perfil == PERFIL_OPCOES[1]:
+        view = view[view["pct_penal"] >= 60.0]
+    elif perfil == PERFIL_OPCOES[2]:
+        view = view[view["pct_penal"] <= 40.0]
+    elif perfil == PERFIL_OPCOES[3]:
+        # A media de comparacao usa a mesma metrica exibida, e nao o total:
+        # comparar a taxa penal contra a media do total classificava errado.
+        pop = view["populacao_censo_2022"].sum()
+        media = (view["valor_exibicao"].sum() / pop) if pop else None
+        if media:
+            per_capita = view["valor_exibicao"] / view["populacao_censo_2022"].where(
+                view["populacao_censo_2022"] > 0
+            )
+            view = view[per_capita >= media]
+
+    if faixa == FAIXA_PROXIMA:
+        view = view[view["faixa_distancia"] == FAIXA_PROXIMA]
+    elif faixa == FAIXA_INTERMEDIARIA:
+        view = view[view["faixa_distancia"] == FAIXA_INTERMEDIARIA]
+    elif faixa == FAIXA_DISTANTE:
+        view = view[view["faixa_distancia"] == FAIXA_DISTANTE]
+
+    if busca:
+        termo = busca.strip().lower()
+        colunas_texto = ["municipio", "regiao_intermediaria", "regiao_imediata", "ibge_code"]
+        mascara = False
+        for coluna in colunas_texto:
+            if coluna in view.columns:
+                mascara = mascara | view[coluna].astype(str).str.lower().str.contains(termo, na=False)
+        view = view[mascara]
+
+    return view
+
+
+def _preparar_exportacao(df: pd.DataFrame) -> pd.DataFrame:
+    colunas = [
+        "ibge_code", "municipio", "regiao_intermediaria", "regiao_imediata",
+        "populacao_censo_2022", "valor_total", "valor_penal", "valor_social",
+        "pct_penal", "taxa_total", "taxa_penal", "taxa_social",
+        "distancia_pci_km", "faixa_distancia", "pci_proxima",
     ]
-
-    df_tabela_final = df_view_sorted[colunas_exibicao].rename(
-        columns={
-            "ranking": "Pos.",
-            "municipio": "Município",
-            "regiao_intermediaria": "Região Intermediária",
-            "populacao_censo_2022": "População (2022)",
-            col_total: "Total Ocorrências",
-            col_penal: "Indício Penal",
-            "demanda_social": "Demanda Social",
-            "pct_penal_mun": "% Penal",
-            "taxa_total_exibicao": f"Total ({label_escala})",
-            "taxa_penal_exibicao": f"Penal ({label_escala})",
-            "distancia_pci_km": "Dist. PCI (km)",
-            "pci_proxima": "PCI de Referência"
-        }
-    )
-
-    df_tabela_formatada = df_tabela_final.copy()
-    df_tabela_formatada["População (2022)"] = df_tabela_formatada["População (2022)"].apply(format_brazilian)
-    df_tabela_formatada["Total Ocorrências"] = df_tabela_formatada["Total Ocorrências"].apply(format_brazilian)
-    df_tabela_formatada["Indício Penal"] = df_tabela_formatada["Indício Penal"].apply(format_brazilian)
-    df_tabela_formatada["Demanda Social"] = df_tabela_formatada["Demanda Social"].apply(format_brazilian)
-    df_tabela_formatada["% Penal"] = df_tabela_formatada["% Penal"].apply(lambda v: f"{v:.1f}%")
-    df_tabela_formatada[f"Total ({label_escala})"] = df_tabela_formatada[f"Total ({label_escala})"].apply(lambda v: f"{v:.1f}")
-    df_tabela_formatada[f"Penal ({label_escala})"] = df_tabela_formatada[f"Penal ({label_escala})"].apply(lambda v: f"{v:.1f}")
-    df_tabela_formatada["Dist. PCI (km)"] = df_tabela_formatada["Dist. PCI (km)"].apply(lambda v: f"{v:.1f} km")
-
-    st.dataframe(
-        df_tabela_formatada,
-        hide_index=True,
-        use_container_width=True,
-        width="stretch"
-    )
-
-    # Download em Múltiplos Formatos
-    col_down1, col_down2 = st.columns(2)
-    with col_down1:
-        st.download_button(
-            label="📥 Baixar Dados Filtrados em CSV",
-            data=df_view_sorted.to_csv(index=False).encode("utf-8"),
-            file_name=f"sc_disque100_municipios_{grupo_key}_{year_param}_{fator_pop}hab.csv",
-            mime="text/csv"
-        )
-    with col_down2:
-        st.download_button(
-            label="📥 Baixar Dados Filtrados em JSON",
-            data=df_view_sorted.to_json(orient="records", force_ascii=False, indent=2).encode("utf-8"),
-            file_name=f"sc_disque100_municipios_{grupo_key}_{year_param}_{fator_pop}hab.json",
-            mime="application/json"
-        )
-
+    presentes = [c for c in colunas if c in df.columns]
+    return df[presentes].copy()

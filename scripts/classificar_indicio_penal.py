@@ -29,9 +29,15 @@ import sys
 import re
 import argparse
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
+
+CURRENT_DIR = Path(__file__).resolve().parent
+if str(CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(CURRENT_DIR))
+
+from colunas_disque100 import ResolvedorColunas, texto_limpo
 
 
 # =============================================================================
@@ -148,55 +154,85 @@ PENAL_TAXONOMY = [
 ]
 
 
-def extrair_texto_caso(row: pd.Series) -> str:
-    """Extrai e consolida com segurança todas as colunas de violação presentes na linha."""
-    partes = []
-    # Colunas textuais potenciais em ambas as eras
-    colunas_candidatas = [
-        "violacao", "violacoes", "sub_grupo_violacao",
-        "Grupo_vulnerável", "Grupo vulnerável", "grupo_violacao",
-        "Motivação", "motivacoes"
-    ]
-    for col in colunas_candidatas:
-        val = row.get(col, "")
-        if pd.notna(val) and val is not None:
-            s_val = str(val).strip()
-            if s_val and s_val.upper() not in ("NAN", "NULL", "NONE", "<NA>", "NI", ""):
-                partes.append(s_val)
+# Campos textuais que descrevem a violacao relatada. A ordem nao altera o
+# resultado: a taxonomia varre o texto concatenado.
+CAMPOS_TEXTO_VIOLACAO = (
+    "violacao", "subgrupo_violacao", "grupo_vulneravel", "motivacao",
+)
 
-    return " ; ".join(partes).upper()
+# Cache de resolvedores por assinatura de colunas. `classificar_caso` pode ser
+# chamada linha a linha sem resolvedor (uso interativo e notebook); sem o cache,
+# cada chamada reconstruiria o indice de colunas.
+_CACHE_RESOLVEDORES: Dict[Tuple[str, ...], ResolvedorColunas] = {}
 
 
-def sinal_reforco_penal(row: pd.Series) -> Tuple[bool, str]:
+def resolvedor_para(row: Any) -> ResolvedorColunas:
+    """Devolve (e memoriza) o resolvedor correspondente as colunas desta linha."""
+    try:
+        chaves = tuple(row.keys())
+    except AttributeError:  # pd.Series
+        chaves = tuple(row.index)
+    cached = _CACHE_RESOLVEDORES.get(chaves)
+    if cached is None:
+        cached = ResolvedorColunas(chaves)
+        _CACHE_RESOLVEDORES[chaves] = cached
+    return cached
+
+
+def extrair_texto_caso(row: Any, resolvedor: Optional[ResolvedorColunas] = None) -> str:
+    """Consolida em um unico texto as colunas que descrevem a violacao relatada."""
+    res = resolvedor or resolvedor_para(row)
+    return res.concatenar(row, CAMPOS_TEXTO_VIOLACAO)
+
+
+def sinal_reforco_penal(
+    row: Any,
+    resolvedor: Optional[ResolvedorColunas] = None,
+) -> Tuple[bool, str]:
     """
-    Identifica com rigor sinais fáticos complementares que atestam natureza penal,
-    eliminando rigorosamente falsos positivos oriundos de valores nulos.
+    Identifica sinais fáticos complementares que atestam natureza penal quando o
+    texto da violação, isolado, não é típico. Valores que representam ausência de
+    informação já foram descartados por `texto_limpo`.
     """
-    # 1. Denúncia emergencial / Risco de morte / Flagrante
-    for col in ("Denúncia_emergencial", "Denúncia emergencial", "denuncia_emergencial"):
-        val = str(row.get(col, "") or "").upper().strip()
-        if any(k in val for k in ("RISCO IMINENTE", "FLAGRANTE", "SANGRAMENTO", "EMERGÊNCI", "IMINENTE")):
-            return True, "FLAGRANTE_OU_RISCO_IMINENTE"
+    res = resolvedor or resolvedor_para(row)
+
+    # 1. Denúncia emergencial, risco de morte ou flagrante
+    val = res.valor(row, "denuncia_emergencial")
+    if any(k in val for k in ("RISCO IMINENTE", "FLAGRANTE", "SANGRAMENTO", "EMERGÊNCI", "EMERGENCI", "IMINENTE")):
+        return True, "FLAGRANTE_OU_RISCO_IMINENTE"
 
     # 2. Cenário policial ou prisional
-    for col in ("Cenário_da_violação", "Cenário da violação", "cenario_local", "cenario_da_violacao"):
-        val = str(row.get(col, "") or "").upper().strip()
-        if any(k in val for k in ("DELEGACIA", "PRESÍDIO", "PRESIDIO", "PENITENCIÁR", "PENITENCIAR", "CADEIA", "CUSTÓDIA", "CUSTODIA")):
-            return True, "CENARIO_POLICIAL_OU_PRISIONAL"
+    val = res.valor(row, "cenario_violacao")
+    if any(k in val for k in ("DELEGACIA", "PRESÍDIO", "PRESIDIO", "PENITENCIÁR", "PENITENCIAR", "CADEIA", "CUSTÓDIA", "CUSTODIA")):
+        return True, "CENARIO_POLICIAL_OU_PRISIONAL"
 
-    # 3. Suspeito ou Vítima em cumprimento de pena ou custódia cautelar
-    for col in ("Suspeito_preso", "Suspeito preso", "Vítima_preso_a", "Vítima preso(a)", "suspeito_preso"):
-        val = str(row.get(col, "") or "").upper().strip()
-        if any(k in val for k in ("RECLUSÃO", "RECLUSAO", "TEMPORÁRIA", "TEMPORARIA", "PREVENTIVA", "FLAGRANTE", "SEMI-ABERTO", "PRISÃO", "PRISAO")):
+    # 3. Suspeito ou vítima em cumprimento de pena ou custódia cautelar.
+    #    Valores afirmativos observados na série: "PENA (RECLUSÃO)",
+    #    "PENA (SEMI-ABERTO)", "PENA", "PREVENTIVA", "TEMPORÁRIA", "FLAGRANTE"
+    #    e "MEDIDA SOCIOEDUCATIVA".
+    for campo in ("suspeito_preso", "vitima_presa"):
+        val = res.valor(row, campo)
+        if any(k in val for k in (
+            "RECLUS", "TEMPORÁRI", "TEMPORARI", "PREVENTIV", "FLAGRANTE",
+            "SEMI-ABERTO", "SEMIABERTO", "PRISÃO", "PRISAO", "PENA",
+            "SOCIOEDUCATIV", "REGIME",
+        )):
             return True, "CUSTODIA_PRISIONAL_ATIVA"
 
-    return False, "SEM_REFORCO_FÁTICO"
+    return False, "SEM_REFORCO_FATICO"
 
 
-def classificar_caso(row: pd.Series) -> Dict[str, Any]:
-    """Classifica detalhadamente um registro individual do Disque 100."""
-    texto = extrair_texto_caso(row)
-    reforco_penal, motivo_reforco = sinal_reforco_penal(row)
+def classificar_caso(row: Any, resolvedor: Optional[ResolvedorColunas] = None) -> Dict[str, Any]:
+    """
+    Classifica um registro individual do Disque 100.
+
+    `resolvedor` deve vir construído a partir do esquema do arquivo de origem
+    quando a função é chamada em lote; sem ele, é resolvido e memorizado a
+    partir das próprias chaves da linha.
+    """
+    res = resolvedor or resolvedor_para(row)
+    texto = extrair_texto_caso(row, res)
+    reforco_penal, motivo_reforco = sinal_reforco_penal(row, res)
 
     # 1. Avaliação pelas Regras da Taxonomia Jurídico-Penal
     for regra in PENAL_TAXONOMY:
@@ -213,11 +249,26 @@ def classificar_caso(row: pd.Series) -> Dict[str, Any]:
                     "motivo_reforco": motivo_reforco
                 }
 
-    # 2. Contexto Específico: Violência Psicológica contra Mulher ou Idoso
+    # 2. Contexto específico: violência psicológica contra mulher ou pessoa idosa.
+    #    O módulo declarado pelo próprio Disque 100 prevalece sobre o gênero da
+    #    vítima: uma denúncia registrada no módulo "Pessoa Idosa" é violência
+    #    psicológica contra pessoa idosa, ainda que a vítima seja mulher.
     if any(k in texto for k in ("HUMILHAÇÃO", "HUMILHACAO", "HOSTILIZAÇÃO", "HOSTILIZACAO", "VIOLÊNCIA PSICOLÓGICA", "VIOLENCIA PSICOLOGICA")):
-        grp = str(row.get("Grupo_vulnerável", "") or row.get("grupo_violacao", "") or "").upper()
-        sexo = str(row.get("vitima_sexo", "") or row.get("Gênero_da_vítima", "") or "").upper()
-        if any(w in grp for w in ("MULHER", "FEMIN")) or "FEMIN" in sexo or "F" == sexo:
+        grp = res.valor(row, "grupo_vulneravel")
+        sexo = res.valor(row, "genero_vitima")
+
+        if any(i in grp for i in ("IDOSA", "IDOSO")):
+            return {
+                "indicio_penal": True,
+                "indicio_penal_texto": True,
+                "indicio_penal_reforco": reforco_penal,
+                "categoria_penal": "VIOLENCIA_PSICOLOGICA_CONTRA_IDOSO",
+                "grau_certeza": "MEDIO",
+                "fundamentacao_legal": "Arts. 96 e 99 da Lei 10.741/03 (Estatuto da Pessoa Idosa)",
+                "orgao_prioritario": "DELEGACIA_DE_POLICIA_E_MINISTERIO_PUBLICO",
+                "motivo_reforco": motivo_reforco
+            }
+        if "MULHER" in grp or "FEMIN" in sexo or sexo == "F":
             return {
                 "indicio_penal": True,
                 "indicio_penal_texto": True,
@@ -226,17 +277,6 @@ def classificar_caso(row: pd.Series) -> Dict[str, Any]:
                 "grau_certeza": "MEDIO",
                 "fundamentacao_legal": "Art. 147-B do Código Penal (Lei 14.188/21 - Violência Psicológica)",
                 "orgao_prioritario": "DELEGACIA_DA_MULHER_DPCAMI",
-                "motivo_reforco": motivo_reforco
-            }
-        if any(i in grp for i in ("IDOSA", "IDOSO")):
-            return {
-                "indicio_penal": True,
-                "indicio_penal_texto": True,
-                "indicio_penal_reforco": reforco_penal,
-                "categoria_penal": "VIOLENCIA_PSICOLOGICA_CONTRA_IDOSO",
-                "grau_certeza": "MEDIO",
-                "fundamentacao_legal": "Arts. 96 e 99 da Lei 10.741/03 (Estatuto do Idoso)",
-                "orgao_prioritario": "DELEGACIA_DE_POLICIA_E_MINISTERIO_PUBLICO",
                 "motivo_reforco": motivo_reforco
             }
 
@@ -292,39 +332,39 @@ def main():
         print(f"[-] Erro: Arquivo de entrada '{args.entrada}' não encontrado.")
         sys.exit(1)
 
-    print(f"📖 Lendo arquivo: {entrada_path.name}...")
+    print(f"Lendo arquivo: {entrada_path.name}...")
     if entrada_path.suffix.lower() == ".parquet":
         df = pd.read_parquet(entrada_path)
     else:
         df = pd.read_csv(entrada_path, low_memory=False)
 
-    print(f"⚖️ Executando classificação penal em {len(df):,} registros...")
+    print(f"Executando classificação penal em {len(df):,} registros...")
     df = classificar(df)
 
     saida_path = Path(args.saida)
     df.to_csv(saida_path, index=False)
-    print(f"💾 Base classificada salva em: '{saida_path}'")
+    print(f"Base classificada salva em: '{saida_path}'")
 
     total = len(df)
     penal = df["indicio_penal"].sum()
     social = total - penal
 
     print("\n" + "=" * 65)
-    print("📊 RESULTADO CONSOLIDADO DA CLASSIFICAÇÃO")
+    print("RESULTADO CONSOLIDADO DA CLASSIFICAÇÃO")
     print("=" * 65)
     print(f"Total de registros analisados: {total:,}")
     print(f" • Com indício de infração penal: {penal:,} ({penal/total:.1%})")
     print(f" • Sem indício penal (Rede Social): {social:,} ({social/total:.1%})")
 
-    print("\n🔍 Distribuição por Grau de Certeza:")
+    print("\nDistribuição por Grau de Certeza:")
     for grau, cnt in df["grau_certeza"].value_counts().items():
         print(f"   [{grau:7s}]: {cnt:6,d} ({cnt/total:5.1%})")
 
-    print("\n🏛️ Distribuição por Categoria Jurídico-Penal:")
+    print("\nDistribuição por Categoria Jurídico-Penal:")
     for cat, cnt in df["categoria_penal"].value_counts().head(10).items():
         print(f"   - {cat}: {cnt:,} ({cnt/total:.1%})")
 
-    print("\n🎯 Órgãos de Encaminhamento Prioritário:")
+    print("\nÓrgãos de Encaminhamento Prioritário:")
     for org, cnt in df["orgao_prioritario"].value_counts().head(5).items():
         print(f"   • {org}: {cnt:,} ({cnt/total:.1%})")
     print("=" * 65)

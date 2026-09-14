@@ -1,19 +1,10 @@
 # =============================================================================
-# Arquivos e Diretórios Ocultos (.alguma-coisa)
-# =============================================================================
-# Ignorar todos os arquivos e diretórios iniciados por ponto (.alguma-coisa)
-.*
-
-# Exceção: Preservar o próprio .gitignore
-!.gitignore
-
-# =============================================================================
-# Ambientes Virtuais, Caches e Ferramentas Python
+# Ambientes virtuais, caches e ferramentas Python
 # =============================================================================
 .venv/
-env/
 venv/
 ENV/
+env/
 .Python
 __pycache__/
 *.py[cod]
@@ -26,16 +17,20 @@ __pycache__/
 *.log
 
 # =============================================================================
-# Configurações de Usuário, Agentes e Variáveis Locais
+# Segredos e configuração local
 # =============================================================================
-.agents/
-.streamlit/
+# Antes havia um `.*` geral aqui, que excluía qualquer arquivo iniciado por
+# ponto. Isso deixava de fora `.streamlit/config.toml`, que o README manda usar,
+# e `.agents/skills/ibge-data-analysis/`, que é dependência de execução do
+# gerador de mapas. A exclusão passou a ser nominal.
 .env
 .env.*
 *.env
+.streamlit/secrets.toml
+.streamlit/credentials.toml
 
 # =============================================================================
-# Sistema Operacional e Editores
+# Sistema operacional e editores
 # =============================================================================
 .DS_Store
 .DS_Store?
@@ -49,3 +44,13 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# =============================================================================
+# Saídas de ferramentas de automação
+# =============================================================================
+.playwright-mcp/
+
+# =============================================================================
+# Backups locais do pipeline
+# =============================================================================
+data/_backup_pre_correcao/

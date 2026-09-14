@@ -1,179 +1,205 @@
 #!/usr/bin/env python3
 """
 =============================================================================
-Dashboard de Inteligência Territorial do Disque 100 - Governo de Santa Catarina
+Painel do Disque 100 em Santa Catarina
 =============================================================================
-Aplicação Streamlit Modular e de Alta Performance.
-Integração com DuckDB, Censo IBGE 2022, Polícia Científica (PCI-SC) e Folium.
+Triagem entre indicio de infracao penal e demanda socioassistencial nas
+denuncias do Disque 100, cruzada com o Censo 2022 do IBGE e com a rede da
+Policia Cientifica de Santa Catarina.
+
+Execucao:
+    streamlit run streamlit_app/app.py
+
+Antes disso, a base precisa existir:
+    python3 scripts/gerar_banco_duckdb_sc.py
+    python3 scripts/build_annual_kpis.py
+    python3 scripts/gerar_geo_pci_sc.py
 =============================================================================
 """
 
+from __future__ import annotations
+
 import sys
 from pathlib import Path
+from typing import Any, Dict
 
-# Garante que a raiz do projeto e a pasta do app estejam no sys.path
-APP_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = APP_DIR.parent if (APP_DIR.parent / "data").exists() else APP_DIR
-for p in [str(PROJECT_ROOT), str(APP_DIR)]:
-    if p not in sys.path:
-        sys.path.insert(0, p)
+# Apenas a raiz do projeto entra no sys.path. Acrescentar tambem a pasta do app
+# permitia importar o mesmo modulo com e sem o prefixo do pacote, criando duas
+# copias em memoria.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
+import pandas as pd
 import streamlit as st
 
-from streamlit_app.config import PAGE_CONFIG, CUSTOM_CSS
-from streamlit_app.data_loader import carregar_dados, get_root_dir
-from streamlit_app.utils.formatters import preparar_df_metricas
-from streamlit_app.components.sidebar import render_sidebar
 from streamlit_app.components.kpi_cards import render_kpi_cards
-from streamlit_app.views.tab_mapa import render_tab_mapa
-from streamlit_app.views.tab_grupos import render_tab_grupos
-from streamlit_app.views.tab_pci import render_tab_pci
+from streamlit_app.components.sidebar import render_sidebar
+from streamlit_app.config import (
+    CUSTOM_CSS,
+    Filtros,
+    NATUREZA_ROTULO,
+    PAGE_CONFIG,
+    SUBTITULO,
+    TITULO,
+    UNIDADE_DENUNCIAS,
+    UNIDADE_ROTULO,
+)
+from streamlit_app.data_loader import carregar_base, carregar_mapa_folium, metadados_base
+from streamlit_app.utils.formatters import preparar_metricas
 from streamlit_app.views.tab_dados import render_tab_dados
+from streamlit_app.views.tab_grupos import render_tab_grupos
 from streamlit_app.views.tab_metodologia import render_tab_metodologia
+from streamlit_app.views.tab_natureza_penal import render_tab_natureza_penal
+from streamlit_app.views.tab_pci import render_tab_pci
+from streamlit_app.views.tab_territorio import render_tab_territorio
 
 
-def main():
-    """Função principal de orquestração da interface executiva."""
+def enriquecer(base: pd.DataFrame, distancia: pd.DataFrame, filtros: Filtros) -> pd.DataFrame:
+    """
+    Junta a matriz de distancia pericial e deriva as metricas do recorte.
+
+    A juncao e vetorizada e municipios ausentes da matriz ficam com distancia
+    indefinida. A versao anterior resolvia linha a linha com `map(lambda)` e
+    atribuia 30 km e a faixa intermediaria a qualquer ausente.
+    """
+    if base.empty:
+        return base
+
+    colunas_distancia = [
+        c for c in (
+            "ibge_code", "distancia_pci_km", "pci_proxima", "pci_proxima_municipio",
+            "faixa_distancia", "lat", "lng",
+        )
+        if c in distancia.columns
+    ]
+    if colunas_distancia and "ibge_code" in colunas_distancia:
+        base = base.merge(
+            distancia[colunas_distancia].astype({"ibge_code": str}),
+            on="ibge_code",
+            how="left",
+        )
+
+    coluna_total, coluna_penal = filtros.colunas()
+    for coluna in (coluna_total, coluna_penal):
+        if coluna not in base.columns:
+            base[coluna] = 0
+
+    return preparar_metricas(
+        base,
+        coluna_total=coluna_total,
+        coluna_penal=coluna_penal,
+        fator_pop=filtros.fator_pop,
+        semestres=filtros.semestres_no_recorte,
+        natureza=filtros.natureza,
+    )
+
+
+def resumir(df: pd.DataFrame, base_bruta: pd.DataFrame, filtros: Filtros) -> Dict[str, Any]:
+    """Agregados do recorte, para os cartoes de resumo."""
+    total = float(df["valor_total"].sum()) if not df.empty else 0.0
+    penal = float(df["valor_penal"].sum()) if not df.empty else 0.0
+    populacao = int(df["populacao_censo_2022"].sum()) if not df.empty else 0
+    anos = max(filtros.semestres_no_recorte, 1) / 2.0
+
+    # Quantos registros de violacao correspondem a essas denuncias, no recorte.
+    fator = None
+    if filtros.unidade_efetiva() == UNIDADE_DENUNCIAS and total:
+        coluna = "registros_com_denuncia_identificavel"
+        if coluna in base_bruta.columns:
+            identificaveis = float(base_bruta[coluna].fillna(0).sum())
+            fator = identificaveis / total if identificaveis else None
+        elif "total_registros" in df.columns:
+            fator = float(df["total_registros"].sum()) / total
+
+    maioria_penal = None
+    if filtros.unidade_efetiva() == UNIDADE_DENUNCIAS and "denuncias_unicas_maioria_penal" in base_bruta.columns:
+        maioria_penal = float(base_bruta["denuncias_unicas_maioria_penal"].fillna(0).sum())
+
+    return {
+        "total": total,
+        "penal": penal,
+        "social": total - penal,
+        "maioria_penal": maioria_penal,
+        "pct_maioria_penal": (maioria_penal / total * 100.0) if (maioria_penal and total) else None,
+        "pct_penal": (penal / total * 100.0) if total else None,
+        "pct_social": ((total - penal) / total * 100.0) if total else None,
+        "populacao": populacao,
+        "taxa": (total / populacao / anos * filtros.fator_pop) if populacao else None,
+        "taxa_penal": (penal / populacao / anos * filtros.fator_pop) if populacao else None,
+        "semestres": filtros.semestres_no_recorte,
+        "fator_expansao": fator,
+    }
+
+
+def main() -> None:
     st.set_page_config(**PAGE_CONFIG)
     st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-    root_dir = get_root_dir()
+    st.markdown(f'<div class="titulo-painel">{TITULO}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="subtitulo-painel">{SUBTITULO}</div>', unsafe_allow_html=True)
 
-    # HEADER GOVERNAMENTAL
-    st.markdown('<div class="main-header">Governo do Estado de Santa Catarina</div>', unsafe_allow_html=True)
+    dados = carregar_base()
+    df_kpi = dados["kpis_grupos_municipios"]
+    df_ano = dados["kpis_grupos_municipios_ano"]
+
+    if df_kpi.empty:
+        st.error(
+            "Base analítica não encontrada. Execute, na raiz do projeto:\n\n"
+            "```\npython3 scripts/gerar_banco_duckdb_sc.py\n"
+            "python3 scripts/build_annual_kpis.py\n"
+            "python3 scripts/gerar_geo_pci_sc.py\n```"
+        )
+        return
+
+    metadados = metadados_base(dados["auditoria"])
+    base, filtros = render_sidebar(df_kpi, df_ano, metadados)
+    df = enriquecer(base, dados["distancia_pci"], filtros)
+
+    # Faixa de contexto: diz em uma linha o que os numeros abaixo significam.
     st.markdown(
-        '<div class="sub-header">Sistema Integrado de Inteligência Territorial do Disque 100 (2011–2026) | '
-        'Perseguição Penal, Rede Assistencial e Capacidade Forense</div>',
-        unsafe_allow_html=True
+        '<div class="faixa-unidade">'
+        f"Unidade: <b>{UNIDADE_ROTULO[filtros.unidade_efetiva()]}</b> &nbsp;·&nbsp; "
+        f"Período: <b>{filtros.label_periodo}</b> &nbsp;·&nbsp; "
+        f"Território: <b>{filtros.rotulo_territorio}</b> &nbsp;·&nbsp; "
+        f"Grupo: <b>{filtros.rotulo_grupo}</b> &nbsp;·&nbsp; "
+        f"Natureza: <b>{NATUREZA_ROTULO[filtros.natureza]}</b>"
+        "</div>",
+        unsafe_allow_html=True,
     )
 
-    # Carregamento cacheado de alta performance dos dados
-    df_kpi, df_pci, df_kpi_ano, audit_data, pci_dist_map = carregar_dados()
+    render_kpi_cards(resumir(df, base, filtros), filtros)
 
-    # Barra lateral de filtros interativos
-    (
-        df_base_filtrado,
-        label_periodo,
-        year_param,
-        metric_type_code,
-        grupo_key,
-        folium_topic,
-        fator_pop,
-        label_escala,
-        regioes_escolhidas,
-        region_code,
-        camada_clusters,
-        camada_pci,
-        camada_rodovias
-    ) = render_sidebar(df_kpi, df_kpi_ano)
-
-    # Identificação das colunas do grupo selecionado
-    if grupo_key == "geral":
-        col_total = "total_denuncias"
-        col_penal = "total_penal"
-    else:
-        col_total = f"{grupo_key}_total"
-        col_penal = f"{grupo_key}_penal"
-
-    # Preparação das métricas e enriquecimento vetorial
-    df_filtrado, label_metrica_ativa = preparar_df_metricas(
-        df_base_filtrado,
-        col_total=col_total,
-        col_penal=col_penal,
-        fator_pop=fator_pop,
-        metric_type_code=metric_type_code,
-        pci_dist_map=pci_dist_map,
-        label_escala=label_escala
-    )
-
-    # Agregações executivas para os cards
-    total_casos = int(df_filtrado[col_total].sum())
-    total_penal = int(df_filtrado[col_penal].sum())
-    total_social = total_casos - total_penal
-    pct_penal = (total_penal / max(total_casos, 1)) * 100
-    pct_social = (total_social / max(total_casos, 1)) * 100
-    pop_total = int(df_filtrado["populacao_censo_2022"].sum())
-    taxa_media_pop = (total_casos / max(pop_total, 1)) * fator_pop
-    taxa_media_penal = (total_penal / max(pop_total, 1)) * fator_pop
-
-    # Renderização dos 4 Cards Executivos
-    render_kpi_cards(
-        total_casos=total_casos,
-        total_penal=total_penal,
-        total_social=total_social,
-        pct_penal=pct_penal,
-        pct_social=pct_social,
-        taxa_media_pop=taxa_media_pop,
-        taxa_media_penal=taxa_media_penal,
-        label_periodo=label_periodo,
-        label_escala=label_escala,
-        fator_pop=fator_pop
-    )
-
-    # Abas estruturadas
-    tab_mapa, tab_grupos, tab_pci, tab_dados, tab_metodologia = st.tabs([
-        "Mapa Territorial e Picos",
-        "Análise Estratégica por Grupos",
-        "Capacidade Forense (PCI-SC)",
-        "Microdados e Tabela Municipal",
-        "Metodologia Jurídica e Fontes Oficiais"
+    abas = st.tabs([
+        "Território",
+        "Grupos vulneráveis",
+        "Natureza penal",
+        "Capacidade forense",
+        "Tabela municipal",
+        "Metodologia e auditoria",
     ])
 
-    with tab_mapa:
-        render_tab_mapa(
-            df_filtrado=df_filtrado,
-            label_metrica_ativa=label_metrica_ativa,
-            fator_pop=fator_pop,
-            folium_topic=folium_topic,
-            metric_type_code=metric_type_code,
-            region_code=region_code,
-            year_param=year_param,
-            camada_clusters=camada_clusters,
-            camada_pci=camada_pci,
-            camada_rodovias=camada_rodovias,
-            root_dir=root_dir
+    with abas[0]:
+        render_tab_territorio(
+            df,
+            df_ano,
+            filtros,
+            dados["malha"],
+            carregar_mapa_folium(),
+            eixos=dados["eixos_rodoviarios"],
+            df_pci=dados["dim_unidades_pci"],
         )
-
-    with tab_grupos:
-        render_tab_grupos(
-            df_filtrado=df_filtrado,
-            pop_total=pop_total,
-            fator_pop=fator_pop,
-            label_escala=label_escala,
-            label_periodo=label_periodo,
-            regioes_escolhidas=regioes_escolhidas
-        )
-
-    with tab_pci:
-        render_tab_pci(
-            df_filtrado=df_filtrado,
-            df_pci=df_pci,
-            col_penal=col_penal,
-            label_escala=label_escala,
-            label_periodo=label_periodo,
-            fator_pop=fator_pop
-        )
-
-    with tab_dados:
-        render_tab_dados(
-            df_filtrado=df_filtrado,
-            col_total=col_total,
-            col_penal=col_penal,
-            label_escala=label_escala,
-            label_metrica_ativa=label_metrica_ativa,
-            fator_pop=fator_pop,
-            taxa_media_pop=taxa_media_pop,
-            grupo_key=grupo_key,
-            year_param=year_param
-        )
-
-    with tab_metodologia:
-        render_tab_metodologia(
-            audit_data=audit_data,
-            root_dir=root_dir
-        )
+    with abas[1]:
+        render_tab_grupos(df, filtros, metadados)
+    with abas[2]:
+        render_tab_natureza_penal(dados["kpis_categoria_penal"], filtros)
+    with abas[3]:
+        render_tab_pci(df, dados["dim_unidades_pci"], filtros, metadados)
+    with abas[4]:
+        render_tab_dados(df, filtros)
+    with abas[5]:
+        render_tab_metodologia(dados["auditoria"])
 
 
 if __name__ == "__main__":
     main()
-

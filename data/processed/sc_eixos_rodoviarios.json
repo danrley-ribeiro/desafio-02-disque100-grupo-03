@@ -1,0 +1,511 @@
+{
+ "metadata": {
+  "natureza": "tracado esquematico",
+  "advertencia": "Traçado esquemático dos corredores rodoviários, com poucos vértices por eixo. Não é a geometria oficial do DNIT ou do DEINFRA e não serve para medir extensão ou tempo de percurso.",
+  "eixos": 20,
+  "federais": 7,
+  "estaduais": 13
+ },
+ "eixos": [
+  {
+   "nome": "BR-101",
+   "descricao": "Eixo litorâneo norte-sul",
+   "tipo": "federal",
+   "coords": [
+    [
+     -26.0,
+     -48.62
+    ],
+    [
+     -26.25,
+     -48.82
+    ],
+    [
+     -26.9,
+     -48.66
+    ],
+    [
+     -27.12,
+     -48.6
+    ],
+    [
+     -27.59,
+     -48.62
+    ],
+    [
+     -27.65,
+     -48.67
+    ],
+    [
+     -28.28,
+     -48.7
+    ],
+    [
+     -28.47,
+     -49.0
+    ],
+    [
+     -28.67,
+     -49.3
+    ],
+    [
+     -28.94,
+     -49.49
+    ],
+    [
+     -29.32,
+     -49.72
+    ]
+   ]
+  },
+  {
+   "nome": "BR-282",
+   "descricao": "Eixo transversal leste-oeste",
+   "tipo": "federal",
+   "coords": [
+    [
+     -27.6,
+     -48.58
+    ],
+    [
+     -27.65,
+     -48.67
+    ],
+    [
+     -27.7,
+     -49.1
+    ],
+    [
+     -27.75,
+     -49.5
+    ],
+    [
+     -27.81,
+     -50.32
+    ],
+    [
+     -27.4,
+     -51.22
+    ],
+    [
+     -27.17,
+     -51.5
+    ],
+    [
+     -26.87,
+     -52.4
+    ],
+    [
+     -27.1,
+     -52.61
+    ],
+    [
+     -26.72,
+     -53.51
+    ]
+   ]
+  },
+  {
+   "nome": "BR-470",
+   "descricao": "Vale do Itajaí e portos",
+   "tipo": "federal",
+   "coords": [
+    [
+     -26.88,
+     -48.65
+    ],
+    [
+     -26.9,
+     -48.8
+    ],
+    [
+     -26.91,
+     -49.06
+    ],
+    [
+     -27.05,
+     -49.3
+    ],
+    [
+     -27.21,
+     -49.64
+    ],
+    [
+     -27.12,
+     -50.15
+    ],
+    [
+     -27.28,
+     -50.58
+    ],
+    [
+     -27.4,
+     -51.22
+    ]
+   ]
+  },
+  {
+   "nome": "BR-116",
+   "descricao": "Planalto norte-sul",
+   "tipo": "federal",
+   "coords": [
+    [
+     -26.11,
+     -49.8
+    ],
+    [
+     -26.5,
+     -50.1
+    ],
+    [
+     -26.9,
+     -50.25
+    ],
+    [
+     -27.81,
+     -50.32
+    ],
+    [
+     -28.3,
+     -50.6
+    ]
+   ]
+  },
+  {
+   "nome": "BR-280",
+   "descricao": "Norte e porto de São Francisco do Sul",
+   "tipo": "federal",
+   "coords": [
+    [
+     -26.24,
+     -48.63
+    ],
+    [
+     -26.3,
+     -48.84
+    ],
+    [
+     -26.48,
+     -49.07
+    ],
+    [
+     -26.35,
+     -49.4
+    ],
+    [
+     -26.11,
+     -49.8
+    ],
+    [
+     -26.17,
+     -50.39
+    ],
+    [
+     -26.23,
+     -51.07
+    ]
+   ]
+  },
+  {
+   "nome": "BR-153",
+   "descricao": "Transbrasiliana",
+   "tipo": "federal",
+   "coords": [
+    [
+     -26.1,
+     -51.05
+    ],
+    [
+     -26.7,
+     -51.5
+    ],
+    [
+     -27.23,
+     -52.02
+    ],
+    [
+     -27.4,
+     -52.1
+    ]
+   ]
+  },
+  {
+   "nome": "BR-163",
+   "descricao": "Extremo oeste",
+   "tipo": "federal",
+   "coords": [
+    [
+     -26.25,
+     -53.6
+    ],
+    [
+     -26.72,
+     -53.51
+    ],
+    [
+     -27.1,
+     -53.6
+    ]
+   ]
+  },
+  {
+   "nome": "SC-401",
+   "descricao": "Norte da Ilha, Florianópolis",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.58,
+     -48.54
+    ],
+    [
+     -27.5,
+     -48.5
+    ],
+    [
+     -27.43,
+     -48.45
+    ]
+   ]
+  },
+  {
+   "nome": "SC-405",
+   "descricao": "Sul da Ilha e aeroporto, Florianópolis",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.6,
+     -48.53
+    ],
+    [
+     -27.68,
+     -48.51
+    ],
+    [
+     -27.75,
+     -48.5
+    ]
+   ]
+  },
+  {
+   "nome": "SC-108",
+   "descricao": "Joinville, Blumenau, Brusque e Criciúma",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -26.3,
+     -48.84
+    ],
+    [
+     -26.48,
+     -49.0
+    ],
+    [
+     -26.91,
+     -49.06
+    ],
+    [
+     -27.09,
+     -48.91
+    ],
+    [
+     -28.1,
+     -49.2
+    ],
+    [
+     -28.67,
+     -49.37
+    ]
+   ]
+  },
+  {
+   "nome": "SC-486",
+   "descricao": "Itajaí e Brusque",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -26.9,
+     -48.66
+    ],
+    [
+     -27.0,
+     -48.78
+    ],
+    [
+     -27.09,
+     -48.91
+    ]
+   ]
+  },
+  {
+   "nome": "SC-350",
+   "descricao": "Rio do Sul, Ituporanga e Caçador",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.21,
+     -49.64
+    ],
+    [
+     -27.41,
+     -49.6
+    ],
+    [
+     -26.77,
+     -51.01
+    ]
+   ]
+  },
+  {
+   "nome": "SC-355",
+   "descricao": "Videira, Fraiburgo e Lebon Régis",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.0,
+     -51.15
+    ],
+    [
+     -27.02,
+     -50.92
+    ],
+    [
+     -26.92,
+     -50.69
+    ]
+   ]
+  },
+  {
+   "nome": "SC-114",
+   "descricao": "Lages, São Joaquim e Taió",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.11,
+     -49.99
+    ],
+    [
+     -27.81,
+     -50.32
+    ],
+    [
+     -28.29,
+     -49.93
+    ]
+   ]
+  },
+  {
+   "nome": "SC-390",
+   "descricao": "Serra do Rio do Rastro, São Joaquim e Tubarão",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -28.29,
+     -49.93
+    ],
+    [
+     -28.39,
+     -49.56
+    ],
+    [
+     -28.47,
+     -49.0
+    ]
+   ]
+  },
+  {
+   "nome": "SC-445",
+   "descricao": "Criciúma e Balneário Rincão",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -28.67,
+     -49.37
+    ],
+    [
+     -28.75,
+     -49.28
+    ],
+    [
+     -28.83,
+     -49.23
+    ]
+   ]
+  },
+  {
+   "nome": "SC-283",
+   "descricao": "Chapecó, Seara e Concórdia",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.1,
+     -52.61
+    ],
+    [
+     -27.15,
+     -52.31
+    ],
+    [
+     -27.23,
+     -52.02
+    ]
+   ]
+  },
+  {
+   "nome": "SC-157",
+   "descricao": "Chapecó, Coronel Freitas e São Lourenço do Oeste",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.1,
+     -52.61
+    ],
+    [
+     -26.9,
+     -52.7
+    ],
+    [
+     -26.35,
+     -52.85
+    ]
+   ]
+  },
+  {
+   "nome": "SC-480",
+   "descricao": "Chapecó e Goio-Ên",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -27.1,
+     -52.61
+    ],
+    [
+     -27.25,
+     -52.6
+    ],
+    [
+     -27.35,
+     -52.65
+    ]
+   ]
+  },
+  {
+   "nome": "SC-418",
+   "descricao": "Serra Dona Francisca, Joinville e São Bento do Sul",
+   "tipo": "estadual",
+   "coords": [
+    [
+     -26.3,
+     -48.84
+    ],
+    [
+     -26.23,
+     -49.05
+    ],
+    [
+     -26.25,
+     -49.37
+    ]
+   ]
+  }
+ ]
+}

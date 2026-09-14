@@ -1,379 +1,261 @@
 #!/usr/bin/env python3
 """
 =============================================================================
-Analisador Completo de Distribuição Penal & Hotspots do Disque 100 (SC 2011–2026)
+Metricas consolidadas da distribuicao penal em Santa Catarina
 =============================================================================
-Processa todos os 22 arquivos Parquet históricos, filtra e classifica com Polars
-a totalidade dos registros do Estado de Santa Catarina (~699k linhas), aplicando
-a taxonomia penal estrita de classificar_indicio_penal.py.
+Produz os tres artefatos derivados consumidos pelo painel executivo em HTML:
 
-Gera métricas detalhadas:
-  1. Distribuição Global: Infrações Penais vs. Rede de Proteção Social
-  2. Distribuição por Família Delitiva (Sexuais, Integridade Física, Ameaça, etc.)
-  3. Evolução Histórica (2011 a 2026)
-  4. Ranking de Picos e Hotspots por 10.000 Habitantes (Censo IBGE 2022)
-  5. Agrupamento por Regiões Intermediárias e Imediatas
-  6. Cruzamento com as 30 Unidades da Polícia Científica de SC (PCI-SC)
+  data/processed/sc_distribuicao_penal_metricas.json
+  data/processed/sc_distribuicao_penal_dados.js     (o JSON acima, como global)
+  data/processed/sc_ranking_focos_penais.csv
+
+Este script passou a LER a base analitica (`fato_denuncias` e
+`kpis_grupos_municipios` no DuckDB) em vez de varrer os 22 arquivos brutos e
+reclassificar tudo por conta propria.
+
+O motivo e de correcao, nao de desempenho: havia duas implementacoes
+independentes da mesma classificacao penal e da mesma resolucao de municipio,
+uma aqui e outra em `gerar_banco_duckdb_sc.py`. Qualquer correcao aplicada a
+uma deixava a outra desatualizada, e foi exatamente o que aconteceu: estes
+arquivos ficaram publicando numeros de uma versao anterior da classificacao.
+Agora ha uma unica fonte de verdade.
+
+Uso:
+    python3 scripts/analisar_distribuicao_penal_sc.py
+Requer que `scripts/gerar_banco_duckdb_sc.py` tenha sido executado antes.
 =============================================================================
 """
 
-import os
-import sys
-import glob
-import re
+from __future__ import annotations
+
 import json
+import sys
 import time
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Any, Dict, List
 
-import polars as pl
+CURRENT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = CURRENT_DIR.parent if CURRENT_DIR.name == "scripts" else CURRENT_DIR
+
+import duckdb
 import pandas as pd
 
-from classificar_indicio_penal import classificar_caso, PENAL_TAXONOMY
-from generate_sc_disque100_folium_dashboard import IBGEClient, haversine_km
+TOPO = 15
+# Piso populacional do ranking por taxa. Sem ele o topo e ocupado por
+# municipios de poucos milhares de habitantes, cuja taxa oscila em ordens de
+# magnitude a cada denuncia.
+POP_MINIMA_RANKING = 20_000
 
 
-def carregar_metadados_ibge_e_populacao(root_dir: Path) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, str], Dict[str, int]]:
-    """Carrega dados oficiais do IBGE para os 295 municípios de SC e Censo 2022."""
-    pop_candidates = [
-        root_dir / "data" / "processed" / "sc_censo_2022_populacao.json",
-        root_dir / "sc_censo_2022_populacao.json"
+def conectar(root_dir: Path) -> duckdb.DuckDBPyConnection:
+    caminhos = [
+        root_dir / "data" / "database" / "sc_disque100_analitico.duckdb",
+        root_dir / "sc_disque100_analitico.duckdb",
     ]
-    pop_file = next((p for p in pop_candidates if p.exists()), None)
-    if not pop_file:
-        raise FileNotFoundError(f"Arquivo de população sc_censo_2022_populacao.json não encontrado!")
+    caminho = next((p for p in caminhos if p.exists()), None)
+    if caminho is None:
+        raise FileNotFoundError(
+            "Base sc_disque100_analitico.duckdb nao encontrada. "
+            "Execute scripts/gerar_banco_duckdb_sc.py primeiro."
+        )
+    print(f"Lendo {caminho.relative_to(root_dir)}")
+    return duckdb.connect(str(caminho), read_only=True)
 
-    with open(pop_file, "r", encoding="utf-8") as f:
-        pop_map = json.load(f)
 
-    client = IBGEClient()
-    df_mun = client.get_municipios_df(uf="SC", engine="polars")
+def montar_metricas(con: duckdb.DuckDBPyConnection, auditoria: Dict[str, Any]) -> Dict[str, Any]:
+    def df(sql: str) -> pd.DataFrame:
+        return con.execute(sql).fetchdf()
 
-    code_to_meta: Dict[str, Dict[str, Any]] = {}
-    name_to_code: Dict[str, str] = {}
+    totais = df("""
+        SELECT COUNT(*) AS total_registros,
+               SUM(indicio_penal) AS total_penal,
+               COUNT(*) - SUM(indicio_penal) AS total_social,
+               COUNT(DISTINCT CASE WHEN grain_denuncia_confiavel = 1 THEN id_denuncia END)
+                   AS total_denuncias_unicas
+        FROM fato_denuncias
+    """).iloc[0]
+    total = int(totais["total_registros"])
+    penal = int(totais["total_penal"])
 
-    for row in df_mun.to_dicts():
-        cid = str(row["municipio-id"])
-        cname = str(row["municipio-nome"]).strip().upper()
-        code_to_meta[cid] = {
-            "ibge_code": cid,
-            "nome": row["municipio-nome"],
-            "microrregiao": row["microrregiao-nome"],
-            "regiao_imediata": row["regiao-imediata-nome"],
-            "regiao_intermediaria": row["regiao-intermediaria-nome"],
-            "populacao": pop_map.get(cid, 10000)
+    por_ano_df = df("""
+        SELECT ano,
+               COUNT(*) AS total,
+               SUM(indicio_penal) AS penal,
+               COUNT(*) - SUM(indicio_penal) AS social,
+               COUNT(DISTINCT CASE WHEN grain_denuncia_confiavel = 1 THEN id_denuncia END)
+                   AS denuncias_unicas,
+               COUNT(DISTINCT semestre) AS semestres
+        FROM fato_denuncias GROUP BY ano ORDER BY ano
+    """)
+    por_ano = {
+        str(int(r["ano"])): {
+            "total": int(r["total"]),
+            "penal": int(r["penal"]),
+            "social": int(r["social"]),
+            "denuncias_unicas": int(r["denuncias_unicas"]),
+            # Arquivos anuais de 2011 a 2019 vem com semestre 0 e cobrem o ano inteiro.
+            "cobertura_parcial": bool(r["semestres"] == 1 and int(r["ano"]) >= 2020),
         }
-        name_to_code[cname] = cid
-
-    return code_to_meta, name_to_code, pop_map
-
-
-def extrair_codigo_municipio(raw_val: Any, name_to_code: Dict[str, str]) -> str:
-    """Extrai com precisão o código IBGE 7 dígitos de qualquer representação textual ou numérica."""
-    if raw_val is None:
-        return None
-    s = str(raw_val).strip()
-    if not s or s.upper() in ("NAN", "NULL", "NONE", "<NA>", "NI", ""):
-        return None
-
-    # Caso Era 2: "4211900 | PALHOÇA" ou "4205407"
-    m_code = re.match(r"^(\d{7})", s)
-    if m_code and m_code.group(1).startswith("42"):
-        return m_code.group(1)
-
-    # Caso Era 1 float ou int 6 dígitos: "420540" -> precisa do 7º dígito ou verificação
-    if s.isdigit() and len(s) == 7 and s.startswith("42"):
-        return s
-
-    # Caso texto com nome do município: "Florianopolis (SC)" ou "PALHOÇA"
-    clean_name = re.sub(r"\s*\(SC\)\s*", "", s, flags=re.IGNORECASE).strip().upper()
-    # Remove acentos para busca flexível
-    if clean_name in name_to_code:
-        return name_to_code[clean_name]
-
-    # Busca aproximada caso haja hífen ou preposição
-    for kname, kcode in name_to_code.items():
-        if kname in clean_name or clean_name in kname:
-            return kcode
-
-    return None
-
-
-def processar_base_sc_completa(root_dir: Path) -> Tuple[Dict[str, Any], pd.DataFrame]:
-    """Varre todos os arquivos parquet, classifica os casos de SC e calcula métricas completas."""
-    t_inicio = time.time()
-    code_to_meta, name_to_code, pop_map = carregar_metadados_ibge_e_populacao(root_dir)
-
-    pqs = sorted(glob.glob(str(root_dir / "data" / "raw" / "disque100-*.parquet"))) or sorted(glob.glob(str(root_dir / "disque100-*.parquet")))
-    print(f"📦 Varrendo {len(pqs)} arquivos Parquet para extração de Santa Catarina...")
-
-    # Estruturas de agregação
-    total_registros_sc = 0
-    total_penal_sc = 0
-    total_social_sc = 0
-
-    por_ano: Dict[str, Dict[str, int]] = {}
-    por_categoria: Dict[str, int] = {}
-    por_grau: Dict[str, int] = {"ALTO": 0, "MEDIO": 0, "BAIXO": 0}
-    por_orgao: Dict[str, int] = {}
-
-    # Por município
-    mun_stats: Dict[str, Dict[str, Any]] = {}
-    for cid, meta in code_to_meta.items():
-        mun_stats[cid] = {
-            "ibge_code": cid,
-            "nome": meta["nome"],
-            "regiao_intermediaria": meta["regiao_intermediaria"],
-            "regiao_imediata": meta["regiao_imediata"],
-            "populacao": meta["populacao"],
-            "total_denuncias": 0,
-            "total_penal": 0,
-            "total_social": 0,
-            "categorias_penais": {}
-        }
-
-    # Processamento de cada arquivo Parquet
-    for p in pqs:
-        nome_arq = os.path.basename(p)
-        m_ano = re.search(r"20\d\d", nome_arq)
-        ano = m_ano.group(0) if m_ano else "Outro"
-
-        if ano not in por_ano:
-            por_ano[ano] = {"total": 0, "penal": 0, "social": 0}
-
-        # Lazy inspection
-        schema = pl.scan_parquet(p).collect_schema()
-        cols = schema.names()
-
-        # Determinar colunas de UF e Município
-        uf_col = None
-        mun_col = None
-        for cand in ["vitima_uf", "UF", "UF_da_vítima", "UF da vítima"]:
-            if cand in cols:
-                uf_col = cand
-                break
-
-        for cand in ["vitima_cod_municipio", "Município", "Município_da_vítima", "vitima_municipio"]:
-            if cand in cols:
-                mun_col = cand
-                break
-
-        if not uf_col:
-            continue
-
-        # Filtro em Polars de alta velocidade
-        df_lazy = pl.scan_parquet(p).filter(pl.col(uf_col).cast(pl.Utf8).str.to_uppercase() == "SC")
-        df_sc = df_lazy.collect()
-        n_sc = len(df_sc)
-        if n_sc == 0:
-            continue
-
-        total_registros_sc += n_sc
-        por_ano[ano]["total"] += n_sc
-
-        # Converte para dicts para classificação penal
-        dicts = df_sc.to_dicts()
-        for r in dicts:
-            classificacao = classificar_caso(r)
-            e_penal = classificacao["indicio_penal"]
-            cat = classificacao["categoria_penal"]
-            grau = classificacao["grau_certeza"]
-            orgao = classificacao["orgao_prioritario"]
-
-            if e_penal:
-                total_penal_sc += 1
-                por_ano[ano]["penal"] += 1
-                por_categoria[cat] = por_categoria.get(cat, 0) + 1
-                por_grau[grau] = por_grau.get(grau, 0) + 1
-                por_orgao[orgao] = por_orgao.get(orgao, 0) + 1
-            else:
-                total_social_sc += 1
-                por_ano[ano]["social"] += 1
-
-            # Extração de município
-            raw_m = r.get(mun_col) if mun_col else None
-            cid = extrair_codigo_municipio(raw_m, name_to_code)
-
-            if cid and cid in mun_stats:
-                mun_stats[cid]["total_denuncias"] += 1
-                if e_penal:
-                    mun_stats[cid]["total_penal"] += 1
-                    mun_stats[cid]["categorias_penais"][cat] = mun_stats[cid]["categorias_penais"].get(cat, 0) + 1
-                else:
-                    mun_stats[cid]["total_social"] += 1
-
-        print(f"  ✓ {nome_arq}: {n_sc:,} registros de SC processados.")
-
-    tempo_total = time.time() - t_inicio
-    print(f"\n⚡ Concluído processamento de {total_registros_sc:,} registros de SC em {tempo_total:.2f} segundos!")
-
-    # Agregação por Regiões Intermediárias
-    por_regiao_intermediaria: Dict[str, Dict[str, Any]] = {}
-    for cid, m in mun_stats.items():
-        reg = m["regiao_intermediaria"]
-        if reg not in por_regiao_intermediaria:
-            por_regiao_intermediaria[reg] = {
-                "nome_regiao": reg,
-                "populacao_total": 0,
-                "total_denuncias": 0,
-                "total_penal": 0,
-                "total_social": 0,
-                "municipios_qtd": 0,
-                "categorias_penais": {}
-            }
-        por_regiao_intermediaria[reg]["populacao_total"] += m["populacao"]
-        por_regiao_intermediaria[reg]["total_denuncias"] += m["total_denuncias"]
-        por_regiao_intermediaria[reg]["total_penal"] += m["total_penal"]
-        por_regiao_intermediaria[reg]["total_social"] += m["total_social"]
-        por_regiao_intermediaria[reg]["municipios_qtd"] += 1
-        for c_cat, c_val in m["categorias_penais"].items():
-            por_regiao_intermediaria[reg]["categorias_penais"][c_cat] = (
-                por_regiao_intermediaria[reg]["categorias_penais"].get(c_cat, 0) + c_val
-            )
-
-    # Cálculo das taxas por 10k hab para regiões
-    for reg, r_data in por_regiao_intermediaria.items():
-        pop = max(r_data["populacao_total"], 1)
-        r_data["taxa_penal_10k"] = round((r_data["total_penal"] / pop) * 10000, 2)
-        r_data["taxa_total_10k"] = round((r_data["total_denuncias"] / pop) * 10000, 2)
-        r_data["pct_penal"] = round((r_data["total_penal"] / max(r_data["total_denuncias"], 1)) * 100, 2)
-
-    # Cálculo de métricas e ranking de municípios
-    lista_ranking = []
-    for cid, m in mun_stats.items():
-        pop = max(m["populacao"], 1)
-        taxa_penal_10k = round((m["total_penal"] / pop) * 10000, 2)
-        taxa_total_10k = round((m["total_denuncias"] / pop) * 10000, 2)
-        pct_penal = round((m["total_penal"] / max(m["total_denuncias"], 1)) * 100, 2)
-
-        # Categoria penal mais frequente
-        top_cat = "N/A"
-        top_cat_count = 0
-        if m["categorias_penais"]:
-            top_cat = max(m["categorias_penais"], key=m["categorias_penais"].get)
-            top_cat_count = m["categorias_penais"][top_cat]
-
-        m["taxa_penal_10k"] = taxa_penal_10k
-        m["taxa_total_10k"] = taxa_total_10k
-        m["pct_penal"] = pct_penal
-        m["top_categoria_penal"] = top_cat
-        m["top_categoria_penal_count"] = top_cat_count
-
-        lista_ranking.append({
-            "ibge_code": cid,
-            "municipio": m["nome"],
-            "regiao_intermediaria": m["regiao_intermediaria"],
-            "regiao_imediata": m["regiao_imediata"],
-            "populacao_censo_2022": m["populacao"],
-            "total_denuncias": m["total_denuncias"],
-            "total_penal": m["total_penal"],
-            "total_social": m["total_social"],
-            "pct_penal": pct_penal,
-            "taxa_penal_10k": taxa_penal_10k,
-            "taxa_total_10k": taxa_total_10k,
-            "top_categoria_penal": top_cat,
-            "top_categoria_qtd": top_cat_count
-        })
-
-    df_ranking = pd.DataFrame(lista_ranking)
-    df_ranking.sort_values(by="taxa_penal_10k", ascending=False, inplace=True)
-    df_ranking["ranking_taxa_penal"] = range(1, len(df_ranking) + 1)
-
-    # Carrega unidades da Polícia Científica de SC para correlação
-    pci_candidates = [
-        root_dir / "data" / "processed" / "unidades_policia_cientifica_sc.json",
-        root_dir / "unidades_policia_cientifica_sc.json"
-    ]
-    pci_file = next((p for p in pci_candidates if p.exists()), None)
-    pci_units = []
-    if pci_file and pci_file.exists():
-        with open(pci_file, "r", encoding="utf-8") as f:
-            pci_units = json.load(f)
-
-    # Consolidação do dicionário final de métricas
-    pct_global_penal = round((total_penal_sc / max(total_registros_sc, 1)) * 100, 2)
-    pct_global_social = round((total_social_sc / max(total_registros_sc, 1)) * 100, 2)
-
-    metricas_consolidadas = {
-        "metadata": {
-            "gerado_em": time.strftime("%Y-%m-%d %H:%M:%S"),
-            "periodo": "2011 a 2026",
-            "estado": "Santa Catarina (SC)",
-            "fonte_primaria": "Disque 100 / Disque Direitos Humanos (MDH)",
-            "fonte_demografica": "IBGE Censo 2022 (População Residente)",
-            "fonte_seguranca": "Polícia Científica de Santa Catarina (PCI-SC)",
-            "tempo_processamento_segundos": round(tempo_total, 2)
-        },
-        "totais_globais": {
-            "total_registros": total_registros_sc,
-            "total_penal": total_penal_sc,
-            "total_social": total_social_sc,
-            "pct_penal": pct_global_penal,
-            "pct_social": pct_global_social
-        },
-        "por_ano": por_ano,
-        "por_categoria_penal": por_categoria,
-        "por_grau_certeza": por_grau,
-        "por_orgao_prioritario": por_orgao,
-        "por_regiao_intermediaria": por_regiao_intermediaria,
-        "municipios": mun_stats,
-        "top_15_maior_taxa_penal_10k": df_ranking.head(15).to_dict(orient="records"),
-        "top_15_maior_volume_absoluto": df_ranking.sort_values(by="total_penal", ascending=False).head(15).to_dict(orient="records"),
-        "policia_cientifica_unidades": len(pci_units)
+        for _, r in por_ano_df.iterrows()
     }
 
-    return metricas_consolidadas, df_ranking
+    def contagem(coluna: str, filtro: str = "") -> Dict[str, int]:
+        onde = f"WHERE {filtro}" if filtro else ""
+        d = df(f"SELECT {coluna} AS k, COUNT(*) AS n FROM fato_denuncias {onde} GROUP BY 1 ORDER BY 2 DESC")
+        return {str(r["k"]): int(r["n"]) for _, r in d.iterrows()}
+
+    regioes_df = df("""
+        SELECT regiao_intermediaria AS regiao,
+               COUNT(DISTINCT ibge_code) AS municipios,
+               COUNT(*) AS total,
+               SUM(indicio_penal) AS penal
+        FROM fato_denuncias GROUP BY 1 ORDER BY total DESC
+    """)
+    pop_regiao = df("""
+        SELECT regiao_intermediaria AS regiao, SUM(populacao_censo_2022) AS populacao
+        FROM dim_municipios GROUP BY 1
+    """).set_index("regiao")["populacao"].to_dict()
+
+    por_regiao = {}
+    for _, r in regioes_df.iterrows():
+        pop = int(pop_regiao.get(r["regiao"], 0) or 0)
+        por_regiao[str(r["regiao"])] = {
+            "municipios": int(r["municipios"]),
+            "populacao_censo_2022": pop or None,
+            "total": int(r["total"]),
+            "penal": int(r["penal"]),
+            "pct_penal": round(100.0 * r["penal"] / r["total"], 2) if r["total"] else None,
+            "taxa_total_10k": round(r["total"] / pop * 10000, 2) if pop else None,
+            "taxa_penal_10k": round(r["penal"] / pop * 10000, 2) if pop else None,
+        }
+
+    municipios_df = df("""
+        SELECT ibge_code, municipio, regiao_intermediaria, regiao_imediata,
+               populacao_censo_2022, total_registros, total_penal, total_social,
+               denuncias_unicas, denuncias_unicas_maioria_penal,
+               taxa_total_10k, taxa_penal_10k
+        FROM kpis_grupos_municipios ORDER BY total_registros DESC
+    """)
+
+    # Categoria penal predominante de cada municipio, para o ranking de focos.
+    predominante = df("""
+        SELECT ibge_code, categoria_penal FROM (
+            SELECT ibge_code, categoria_penal, COUNT(*) AS n,
+                   ROW_NUMBER() OVER (PARTITION BY ibge_code ORDER BY COUNT(*) DESC) AS pos
+            FROM fato_denuncias WHERE indicio_penal = 1
+            GROUP BY ibge_code, categoria_penal
+        ) WHERE pos = 1
+    """).set_index("ibge_code")["categoria_penal"].to_dict()
+    municipios_df["categoria_penal_predominante"] = municipios_df["ibge_code"].map(predominante)
+
+    elegiveis = municipios_df[municipios_df["populacao_censo_2022"] >= POP_MINIMA_RANKING]
+    registros_mun: List[Dict[str, Any]] = json.loads(
+        municipios_df.to_json(orient="records", force_ascii=False)
+    )
+
+    pci = df("SELECT sigla, nome, municipio, tipo, lat, lon FROM dim_unidades_pci ORDER BY tipo, municipio")
+
+    return {
+        "metadata": {
+            "gerado_em": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "periodo": auditoria.get("totais", {}).get("periodo"),
+            "estado": "Santa Catarina",
+            "derivado_de": "fato_denuncias e kpis_grupos_municipios da base analitica",
+            "fonte_primaria": "MDHC, microdados abertos do Disque 100",
+            "fonte_demografica": "IBGE, Censo Demografico 2022, tabela SIDRA 4714",
+            "fonte_seguranca": "Policia Cientifica de Santa Catarina",
+            "unidade_padrao": "registros de violacao",
+            "advertencia_unidade": (
+                auditoria.get("unidade_de_medida", {}).get("advertencia") or ""
+            ),
+            "piso_populacional_ranking": POP_MINIMA_RANKING,
+        },
+        "totais_globais": {
+            "total_registros": total,
+            "total_penal": penal,
+            "total_social": total - penal,
+            "total_denuncias_unicas": int(totais["total_denuncias_unicas"]),
+            "pct_penal": round(100.0 * penal / total, 2) if total else None,
+            "pct_social": round(100.0 * (total - penal) / total, 2) if total else None,
+        },
+        "por_ano": por_ano,
+        "por_categoria_penal": contagem("categoria_penal", "indicio_penal = 1"),
+        "por_grau_certeza": contagem("grau_certeza"),
+        "por_orgao_prioritario": contagem("orgao_prioritario"),
+        "por_grupo_primario": contagem("grupo_primario"),
+        "por_regiao_intermediaria": por_regiao,
+        "municipios": registros_mun,
+        "top_maior_taxa_penal_10k": json.loads(
+            elegiveis.nlargest(TOPO, "taxa_penal_10k").to_json(orient="records", force_ascii=False)
+        ),
+        "top_maior_volume_absoluto": json.loads(
+            municipios_df.nlargest(TOPO, "total_penal").to_json(orient="records", force_ascii=False)
+        ),
+        "policia_cientifica_unidades": json.loads(pci.to_json(orient="records", force_ascii=False)),
+        "limitacoes_conhecidas": auditoria.get("limitacoes_conhecidas", []),
+    }
 
 
-def main():
-    root_dir = Path(__file__).resolve().parent
-    if root_dir.name == "scripts":
-        root_dir = root_dir.parent
-    print("======================================================================")
-    print("🔍 INICIANDO PROCESSAMENTO & CLASSIFICAÇÃO PENAL TOTAL - DISQUE 100 SC")
-    print("======================================================================")
+def main() -> None:
+    root_dir = ROOT_DIR
+    proc = root_dir / "data" / "processed"
+    proc.mkdir(parents=True, exist_ok=True)
 
-    metricas, df_ranking = processar_base_sc_completa(root_dir)
+    auditoria: Dict[str, Any] = {}
+    caminho_auditoria = proc / "sc_relatorio_auditoria_dados.json"
+    if caminho_auditoria.exists():
+        with open(caminho_auditoria, "r", encoding="utf-8") as f:
+            auditoria = json.load(f)
 
-    proc_dir = root_dir / "data" / "processed"
-    proc_dir.mkdir(parents=True, exist_ok=True)
+    con = conectar(root_dir)
+    try:
+        metricas = montar_metricas(con, auditoria)
+    finally:
+        con.close()
 
-    # 1. Salva métricas em JSON
-    json_path = proc_dir / "sc_distribuicao_penal_metricas.json"
+    json_path = proc / "sc_distribuicao_penal_metricas.json"
     with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(metricas, f, ensure_ascii=False, indent=2)
-    print(f"\n💾 Arquivo JSON salvo com sucesso: {json_path}")
+        json.dump(metricas, f, ensure_ascii=False, indent=1)
 
-    # 2. Salva ranking em CSV
-    csv_path = proc_dir / "sc_ranking_focos_penais.csv"
-    df_ranking.to_csv(csv_path, index=False, encoding="utf-8")
-    print(f"💾 Arquivo CSV salvo com sucesso: {csv_path}")
+    # O painel executivo em HTML carrega o mesmo conteudo como variavel global,
+    # para funcionar aberto direto do disco, sem servidor.
+    js_path = proc / "sc_distribuicao_penal_dados.js"
+    with open(js_path, "w", encoding="utf-8") as f:
+        f.write("window.SC_PENAL_METRICAS = ")
+        json.dump(metricas, f, ensure_ascii=False)
+        f.write(";\n")
 
-    # 3. Resumo Estatístico no Console
+    ranking = pd.DataFrame(metricas["top_maior_taxa_penal_10k"])
+    csv_path = proc / "sc_ranking_focos_penais.csv"
+    ranking.to_csv(csv_path, index=False, encoding="utf-8")
+
+    # Este e o ultimo passo do pipeline, portanto e aqui que a tabela de hashes
+    # do relatorio de auditoria e fechada: so agora todos os artefatos de
+    # data/processed/ existem na versao final.
+    if auditoria:
+        sys.path.insert(0, str(CURRENT_DIR))
+        from gerar_banco_duckdb_sc import hashes_processados
+
+        auditoria["arquivos_hashes_sha256"] = hashes_processados(proc)
+        auditoria["timestamp_hashes"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        with open(caminho_auditoria, "w", encoding="utf-8") as f:
+            json.dump(auditoria, f, ensure_ascii=False, indent=2)
+        print(f"  {caminho_auditoria.name}: {len(auditoria['arquivos_hashes_sha256'])} hashes atualizados")
+
     t = metricas["totais_globais"]
-    print("\n======================================================================")
-    print("📊 RESULTADOS EMPÍRICOS CONSOLIDADOS (SC 2011–2026)")
-    print("======================================================================")
-    print(f"• Total de Ocorrências em SC: {t['total_registros']:,}")
-    print(f"• Casos com Indício Penal:    {t['total_penal']:,} ({t['pct_penal']}%)")
-    print(f"• Rede de Proteção Social:    {t['total_social']:,} ({t['pct_social']}%)")
-
-    print("\n⚖️ DISTRIBUIÇÃO POR FAMÍLIA DELITIVA:")
-    for cat, val in sorted(metricas["por_categoria_penal"].items(), key=lambda x: x[1], reverse=True):
-        pct = (val / t["total_penal"]) * 100
-        print(f"  - {cat:40s}: {val:7,d} ({pct:5.2f}%)")
-
-    print("\n📍 TOP 10 FOCOS ESPACIAIS CRÍTICOS (TAXA POR 10K HABITANTES):")
-    for i, row in enumerate(metricas["top_15_maior_taxa_penal_10k"][:10], 1):
-        print(f"  {i:2d}. {row['municipio']:25s} | Pop: {row['populacao_censo_2022']:6,d} | Crimes: {row['total_penal']:5,d} | Taxa: {row['taxa_penal_10k']:6.2f}/10k | Predom: {row['top_categoria_penal']}")
-
-    print("\n🏢 TOP 5 POLOS POR VOLUME ABSOLUTO:")
-    for i, row in enumerate(metricas["top_15_maior_volume_absoluto"][:5], 1):
-        print(f"  {i:2d}. {row['municipio']:25s} | Pop: {row['populacao_censo_2022']:6,d} | Crimes: {row['total_penal']:5,d} | Taxa: {row['taxa_penal_10k']:6.2f}/10k")
-
-    print("======================================================================")
+    print(f"  {json_path.name} ({json_path.stat().st_size / 1024:.0f} KB)")
+    print(f"  {js_path.name} ({js_path.stat().st_size / 1024:.0f} KB)")
+    print(f"  {csv_path.name} ({len(ranking)} municipios)")
+    print("=" * 70)
+    print(f"Registros de violacao   {t['total_registros']:>10,}")
+    print(f"  com indicio penal     {t['total_penal']:>10,} ({t['pct_penal']}%)")
+    print(f"  demanda social        {t['total_social']:>10,} ({t['pct_social']}%)")
+    print(f"Denuncias unicas        {t['total_denuncias_unicas']:>10,}")
+    print(f"Ranking por taxa: piso de {POP_MINIMA_RANKING:,} habitantes")
+    for i, r in enumerate(metricas["top_maior_taxa_penal_10k"][:5], 1):
+        print(f"  {i}. {r['municipio']:<26s} {r['taxa_penal_10k']:>8.1f}/10k  pop {r['populacao_censo_2022']:>8,}")
+    print("=" * 70)
 
 
 if __name__ == "__main__":
     main()
-

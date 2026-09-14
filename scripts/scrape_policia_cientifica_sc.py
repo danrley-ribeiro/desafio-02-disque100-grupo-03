@@ -143,14 +143,14 @@ def scrape_unit(unit_tuple) -> Dict[str, Any]:
 
 
 def main():
-    print("🚀 Extraindo em paralelo as 30 unidades da Polícia Científica de SC...")
+    print("Extraindo em paralelo as 30 unidades da Polícia Científica de SC...")
     results = []
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(scrape_unit, u): u[1] for u in UNIDADES_SLUGS}
         for future in as_completed(futures):
             data = future.result()
             results.append(data)
-            print(f"  ✓ {data['municipio']}: {data['nome_unidade']} | {data['vinculacao']}")
+            print(f"  {data['municipio']}: {data['nome_unidade']} | {data['vinculacao']}")
 
     results.sort(key=lambda x: x["municipio"])
 
@@ -158,7 +158,7 @@ def main():
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
-    print(f"\n✅ Total de {len(results)} unidades salvas com sucesso em '{out_file}'!")
+    print(f"\nTotal de {len(results)} unidades salvas com sucesso em '{out_file}'!")
 
 
 if __name__ == "__main__":

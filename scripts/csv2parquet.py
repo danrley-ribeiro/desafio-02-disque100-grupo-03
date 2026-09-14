@@ -80,7 +80,7 @@ def validate_parquet_against_csv(
     import polars as pl
 
     print("\n" + "=" * 65)
-    print(" 🔍 INICIANDO VALIDAÇÃO DE INTEGRIDADE (CSV vs PARQUET)")
+    print(" INICIANDO VALIDAÇÃO DE INTEGRIDADE (CSV vs PARQUET)")
     print("=" * 65)
     
     val_start = time.perf_counter()
@@ -103,32 +103,32 @@ def validate_parquet_against_csv(
         pq_rows = lf_pq.select(pl.len()).collect().item()
 
         if csv_rows != pq_rows:
-            print(f" ❌ ERRO: Contagem de linhas diverge! CSV: {csv_rows:,} | Parquet: {pq_rows:,}")
+            print(f" ERRO: Contagem de linhas diverge! CSV: {csv_rows:,} | Parquet: {pq_rows:,}")
             return False
-        print(f" • [1/4] Total de Linhas: {csv_rows:,} registros idênticos ✅")
+        print(f" • [1/4] Total de Linhas: {csv_rows:,} registros idênticos ")
 
         # 2. Checagem de Colunas
         csv_cols = lf_csv.collect_schema().names()
         pq_cols = lf_pq.collect_schema().names()
 
         if csv_cols != pq_cols:
-            print(f" ❌ ERRO: Colunas divergem! CSV: {len(csv_cols)} | Parquet: {len(pq_cols)}")
+            print(f" ERRO: Colunas divergem! CSV: {len(csv_cols)} | Parquet: {len(pq_cols)}")
             return False
-        print(f" • [2/4] Estrutura: {len(csv_cols)} colunas conferidas na mesma ordem ✅")
+        print(f" • [2/4] Estrutura: {len(csv_cols)} colunas conferidas na mesma ordem ")
 
         # 3. Validação de Início e Fim (Head & Tail)
         head_csv = lf_csv.head(50).collect()
         head_pq = lf_pq.head(50).collect()
         if not head_csv.equals(head_pq):
-            print(" ❌ ERRO: Divergência encontrada no início do arquivo (Head 50).")
+            print(" ERRO: Divergência encontrada no início do arquivo (Head 50).")
             return False
 
         tail_csv = lf_csv.tail(50).collect()
         tail_pq = lf_pq.tail(50).collect()
         if not tail_csv.equals(tail_pq):
-            print(" ❌ ERRO: Divergência encontrada no final do arquivo (Tail 50).")
+            print(" ERRO: Divergência encontrada no final do arquivo (Tail 50).")
             return False
-        print(" • [3/4] Amostras de Extremidades (Head/Tail - 100 linhas): 100% Idênticas ✅")
+        print(" • [3/4] Amostras de Extremidades (Head/Tail - 100 linhas): 100% Idênticas ")
 
         # 4. Sorteio de Amostras Aleatórias por todo o dataset
         actual_samples = min(sample_size, csv_rows)
@@ -149,22 +149,22 @@ def validate_parquet_against_csv(
         )
 
         if not sample_csv.equals(sample_pq):
-            print(" ❌ ERRO: Divergência encontrada nas amostras aleatórias!")
+            print(" ERRO: Divergência encontrada nas amostras aleatórias!")
             for col in csv_cols:
                 if not sample_csv[col].equals(sample_pq[col]):
                     print(f"    - Divergência detectada na coluna: '{col}'")
             return False
 
         val_elapsed = time.perf_counter() - val_start
-        print(f" • [4/4] Amostragem Aleatória ({actual_samples:,} linhas sorteadas): 100% Idênticas ✅")
+        print(f" • [4/4] Amostragem Aleatória ({actual_samples:,} linhas sorteadas): 100% Idênticas ")
         print(f" • Tempo de Validação: {val_elapsed:.2f}s")
         print("=" * 65)
-        print(" 🎉 RESULTADO: O arquivo Parquet é 100% IDÊNTICO ao CSV original!")
+        print(" RESULTADO: O arquivo Parquet é 100% IDÊNTICO ao CSV original!")
         print("=" * 65)
         return True
 
     except Exception as e:
-        print(f" ⚠️ Aviso durante validação: {e}")
+        print(f" Aviso durante validação: {e}")
         return False
 
 def convert_csv_to_parquet(
@@ -196,7 +196,7 @@ def convert_csv_to_parquet(
     file_size_mb = file_size_bytes / (1024 * 1024)
 
     print("=" * 65)
-    print(" 🚀 INICIANDO CONVERSÃO ULTRA-OTIMIZADA (CSV -> PARQUET)")
+    print(" INICIANDO CONVERSÃO ULTRA-OTIMIZADA (CSV -> PARQUET)")
     print("=" * 65)
     print(f" • Arquivo de Entrada : {csv_path.name} ({file_size_mb:.2f} MB)")
     print(f" • Arquivo de Saída   : {parquet_path.name}")
@@ -277,7 +277,7 @@ def convert_csv_to_parquet(
     throughput = file_size_mb / elapsed if elapsed > 0 else 0
 
     print("\n" + "=" * 65)
-    print(" ✅ CONVERSÃO CONCLUÍDA COM SUCESSO!")
+    print(" CONVERSÃO CONCLUÍDA COM SUCESSO!")
     print("=" * 65)
     print(f" • Tempo decorrido    : {elapsed:.2f} segundos")
     print(f" • Throughput         : {throughput:.2f} MB/s")

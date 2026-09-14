@@ -42,14 +42,14 @@ def sample_parquet_bases(
     if not files:
         raise FileNotFoundError(f"Nenhum arquivo 'disque100-*.parquet' encontrado em: {parquet_dir}")
 
-    print(f"📦 1. Mapeando {len(files)} arquivos Parquet do Disque 100...")
+    print(f"1. Mapeando {len(files)} arquivos Parquet do Disque 100...")
     file_counts: List[Tuple[str, int]] = []
     for f in files:
         meta = pq.ParquetFile(f).metadata
         file_counts.append((f, meta.num_rows))
 
     total_rows = sum(c[1] for c in file_counts)
-    print(f"   📊 Total acumulado no acervo histórico: {total_rows:,} registros.")
+    print(f"   Total acumulado no acervo histórico: {total_rows:,} registros.")
 
     # Alocação proporcional de amostras por arquivo
     allocated: List[Tuple[str, int, int]] = []
@@ -63,7 +63,7 @@ def sample_parquet_bases(
         max_idx = max(range(len(allocated)), key=lambda i: allocated[i][1])
         allocated[max_idx] = (allocated[max_idx][0], allocated[max_idx][1], allocated[max_idx][2] + diff)
 
-    print(f"🎯 2. Sorteando {sample_size} registros aleatórios (Seed: {seed})...")
+    print(f"2. Sorteando {sample_size} registros aleatórios (Seed: {seed})...")
     random.seed(seed)
     sampled_dfs: List[pl.DataFrame] = []
 
@@ -111,11 +111,11 @@ def sample_parquet_bases(
         ])
         sampled_dfs.append(sampled_slice)
 
-    print("🔗 3. Unindo todas as bases amostradas (diagonal concat)...")
+    print("3. Unindo todas as bases amostradas (diagonal concat)...")
     combined = pl.concat(sampled_dfs, how="diagonal")
-    print(f"   📋 DataFrame preliminar: {len(combined)} linhas x {len(combined.columns)} colunas.")
+    print(f"   DataFrame preliminar: {len(combined)} linhas x {len(combined.columns)} colunas.")
 
-    print("🧹 4. Excluindo colunas vazias...")
+    print("4. Excluindo colunas vazias...")
     empty_columns = []
     valid_columns = []
 
@@ -136,16 +136,16 @@ def sample_parquet_bases(
             valid_columns.append(col)
 
     df_final = combined.select(valid_columns)
-    print(f"   ❌ Colunas vazias removidas ({len(empty_columns)}): {empty_columns}")
-    print(f"   ✅ Colunas preservadas com dados ({len(valid_columns)}): {len(valid_columns)} colunas.")
+    print(f"   Colunas vazias removidas ({len(empty_columns)}): {empty_columns}")
+    print(f"   Colunas preservadas com dados ({len(valid_columns)}): {len(valid_columns)} colunas.")
 
     if output_csv:
         output_csv = Path(output_csv)
         df_final.write_csv(output_csv)
         file_size_kb = output_csv.stat().st_size / 1024
-        print(f"💾 5. Arquivo CSV gravado com sucesso: '{output_csv.name}' ({file_size_kb:.1f} KB)")
+        print(f"5. Arquivo CSV gravado com sucesso: '{output_csv.name}' ({file_size_kb:.1f} KB)")
 
-    print(f"⏱️ Tempo total de processamento: {time.time() - t0:.2f} segundos.")
+    print(f"⏱ Tempo total de processamento: {time.time() - t0:.2f} segundos.")
     return df_final
 
 

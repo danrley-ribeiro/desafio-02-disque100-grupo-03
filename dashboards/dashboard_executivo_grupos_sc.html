@@ -78,32 +78,32 @@
             Todos os Casos
           </button>
           <button id="btnFiltroPenal" onclick="setFiltroPenal(true)" class="px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white transition-all">
-            ⚖️ Apenas Indícios Penais
+            Apenas Indícios Penais
           </button>
         </div>
       </div>
 
       <div class="flex flex-wrap gap-2" id="grupoPillsContainer">
         <button onclick="selecionarGrupo('geral')" id="pill-geral" class="grupo-pill active-tab px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>🛡️ Visão Geral</span>
+          <span>Visão Geral</span>
         </button>
         <button onclick="selecionarGrupo('criancas')" id="pill-criancas" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>👶 Crianças & Adolescentes</span>
+          <span>Crianças & Adolescentes</span>
         </button>
         <button onclick="selecionarGrupo('mulheres')" id="pill-mulheres" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>👩 Mulheres (Gênero/Doméstica)</span>
+          <span>Mulheres (Gênero/Doméstica)</span>
         </button>
         <button onclick="selecionarGrupo('idosos')" id="pill-idosos" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>👴 Pessoas Idosas</span>
+          <span>Pessoas Idosas</span>
         </button>
         <button onclick="selecionarGrupo('pcd')" id="pill-pcd" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>♿ Pessoas com Deficiência</span>
+          <span>Pessoas com Deficiência</span>
         </button>
         <button onclick="selecionarGrupo('lgbt')" id="pill-lgbt" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>🏳️‍🌈 População LGBTQIA+</span>
+          <span>População LGBTQIA+</span>
         </button>
         <button onclick="selecionarGrupo('prisional')" id="pill-prisional" class="grupo-pill px-4 py-2 rounded-xl text-xs font-bold border border-slate-700 bg-slate-800/80 text-slate-300 hover:text-white transition-all flex items-center space-x-2">
-          <span>⛓️ Sistema Prisional & Rua</span>
+          <span>Sistema Prisional & Rua</span>
         </button>
       </div>
     </div>
@@ -151,7 +151,7 @@
           <canvas id="chartTop10"></canvas>
         </div>
         <div class="mt-4 p-3 bg-slate-900/80 border border-slate-800 rounded-xl text-xs text-slate-300 flex items-center justify-between">
-          <span>⚠️ Focos no interior possuem taxas até 4,7x maiores que as capitais.</span>
+          <span>Focos no interior possuem taxas até 4,7x maiores que as capitais.</span>
           <a href="dashboard_sc_disque100_folium.html" target="_blank" class="text-indigo-400 hover:text-indigo-300 font-semibold ml-2">Ver Radar no Mapa &rarr;</a>
         </div>
       </div>
@@ -213,7 +213,7 @@
             <span>Modelagem Dimensional DuckDB/SQL</span>
           </div>
           <p class="text-slate-400 text-[11px] leading-relaxed">
-            Estrutura <em>Star Schema</em> com tabelas <code>fato_denuncias_sc</code> (699k linhas), <code>dim_municipios</code> (295 municípios com Censo 2022) e <code>dim_unidades_pci</code> (30 unidades forenses).
+            Estrutura <em>Star Schema</em> com tabelas <code>fato_denuncias</code> (699 mil registros de violação), <code>dim_municipios</code> (295 municípios com Censo 2022) e <code>dim_unidades_pci</code> (30 unidades forenses).
           </p>
         </div>
 
@@ -224,7 +224,7 @@
           </div>
           <p class="text-slate-400 text-[11px] leading-relaxed">
             Execute localmente para visão interativa com filtros dinâmicos:<br>
-            <code class="bg-slate-950 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-[10px]">streamlit run app_sc_disque100_streamlit.py</code>
+            <code class="bg-slate-950 px-1.5 py-0.5 rounded text-emerald-300 font-mono text-[10px]">streamlit run streamlit_app/app.py</code>
           </p>
         </div>
 
@@ -279,7 +279,7 @@
             <tr class="hover:bg-slate-800/30 transition-colors">
               <td class="py-3 px-4 font-bold text-white">Polícia Científica de Santa Catarina (PCI-SC)</td>
               <td class="py-3 px-4"><a href="https://www.policiacientifica.sc.gov.br/unidades/" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px]">https://www.policiacientifica.sc.gov.br/unidades/</a></td>
-              <td class="py-3 px-4 text-slate-400">Estrutura organizacional das 7 superintendências regionais e 23 núcleos periciais.</td>
+              <td class="py-3 px-4 text-slate-400">Estrutura organizacional das 9 superintendências regionais e 21 núcleos periciais.</td>
             </tr>
             <tr class="hover:bg-slate-800/30 transition-colors">
               <td class="py-3 px-4 font-bold text-white">Polícia Civil de Santa Catarina (PCSC)</td>
